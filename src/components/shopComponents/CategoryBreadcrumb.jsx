@@ -1,5 +1,6 @@
 import React from 'react';
 import { Home, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const CategoryBreadcrumb = () => {
   return (
@@ -23,13 +24,11 @@ const CategoryBreadcrumb = () => {
               {/* Breadcrumb */}
               <div className="flex items-center gap-2 text-sm">
                 <Home className="w-4 h-4 text-emerald-600" />
-                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                  Home
-                </a>
+                <Link to = "/home" className="text-emerald-600 hover:text-emerald-700 font-medium"> Home </Link>
+               
                 <ChevronRight className="w-4 h-4 text-gray-400" />
-                <a href="#" className="text-gray-600 hover:text-emerald-600">
-                  Shop
-                </a>
+                 <Link to = "/shop" className="text-emerald-600 hover:text-emerald-700 font-medium"> Shop </Link>
+
                 <ChevronRight className="w-4 h-4 text-gray-400" />
                 <span className="text-gray-800 font-medium">Snack</span>
               </div>

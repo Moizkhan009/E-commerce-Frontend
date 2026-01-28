@@ -8,6 +8,7 @@ const shop = () => {
   return (
     <div>
         {/* <Header/> */}
+        <Header/>
       <CategoryBreadcrumb/>
       <ProductsGridPage/>
       <Newsletter/>

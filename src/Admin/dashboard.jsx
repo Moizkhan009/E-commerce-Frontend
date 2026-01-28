@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { ShoppingCart, Plus, Home, Package, Users, Settings, X, Star } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+
 
 export default function ProductDashboard() {
   const [activeTab, setActiveTab] = useState('products');
@@ -55,6 +57,7 @@ export default function ProductDashboard() {
     badge: '',
     badgeColor: ''
   });
+  console.log(formData)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

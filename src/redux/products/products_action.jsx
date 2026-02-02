@@ -5,7 +5,8 @@ export const fetchProduct = createAsyncThunk(
   async () => {
     try {
       const response = await fetch("http://localhost:5000/api/getProduct");
-
+       console.log( "response from action"  ,response);
+       
       if (!response.ok) {
         console.log("API Error: Failed to fetch product");
         throw new Error("Failed to fetch product");

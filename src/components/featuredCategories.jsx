@@ -6,15 +6,15 @@ const FeaturedCategories = () => {
 
   // Categories data - easily replaceable with API data
   const categories = [
-    { id: 1, name: 'Cake & Milk', items: 11, icon: '🍔', color: 'bg-green-50' },
-    { id: 2, name: 'Oganic Kiwi', items: 6, icon: '🥝', color: 'bg-green-100' },
-    { id: 3, name: 'Peach', items: 6, icon: '🍑', color: 'bg-orange-50' },
-    { id: 4, name: 'Read Apple', items: 10, icon: '🍎', color: 'bg-pink-50' },
+    { id: 1, name: 'Dairy', items: 11, icon: '🍔', color: 'bg-green-50' },
+    { id: 2, name: 'Meat', items: 6, icon: '🥝', color: 'bg-green-100' },
+    { id: 3, name: 'Fruits', items: 6, icon: '🍑', color: 'bg-orange-50' },
+    { id: 4, name: 'Vegetables', items: 10, icon: '🍎', color: 'bg-pink-50' },
     { id: 5, name: 'Snacks', items: 11, icon: '🍿', color: 'bg-yellow-50' },
-    { id: 6, name: 'Vegetables', items: 6, icon: '🥬', color: 'bg-green-50' },
-    { id: 7, name: 'Strawberry', items: 10, icon: '🍓', color: 'bg-red-50' },
-    { id: 9, name: 'Custard apple', items: 10, icon: '🍏', color: 'bg-green-50' },
-    { id: 10, name: 'Coffe & Tea', items: 11, icon: '☕', color: 'bg-amber-50' }
+    { id: 6, name: 'Beverages', items: 6, icon: '🥬', color: 'bg-green-50' },
+    // { id: 7, name: 'Strawberry', items: 10, icon: '🍓', color: 'bg-red-50' },
+    // { id: 9, name: 'Custard apple', items: 10, icon: '🍏', color: 'bg-green-50' },
+    // { id: 10, name: 'Coffe & Tea', items: 11, icon: '☕', color: 'bg-amber-50' }
   ];
 
   // Filter buttons - easily customizable

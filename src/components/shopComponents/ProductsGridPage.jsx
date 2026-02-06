@@ -356,7 +356,7 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Eye, Heart, Grid, List } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../redux/products/products_action";
-
+import { HashLoader } from 'react-spinners';
 const ProductsGridPage = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [showCount, setShowCount] = useState(50);
@@ -374,8 +374,13 @@ const ProductsGridPage = () => {
   }, [dispatch]);
 
   // Loading aur error states
-  if (status === "loading") return <div className="text-center py-20">Loading products...</div>;
-  if (status === "failed") return <div className="text-center py-20 text-red-500">Error: {error}</div>;
+if (status === "loading")
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      <HashLoader color="#059669" />
+    </div>
+  );
+    if (status === "failed") return <div className="text-center py-20 text-red-500">Error: {error}</div>;
   
   // Data validation
   if (!product || typeof product !== 'object') {

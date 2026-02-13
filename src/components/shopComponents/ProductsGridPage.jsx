@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Eye, Heart, Grid, List } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../redux/products/products_action";
-import { HashLoader } from 'react-spinners';
+import {HashLoader} from "react-spinners"
 
 
 const ProductsGridPage = () => {

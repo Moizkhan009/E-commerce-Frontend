@@ -8,7 +8,7 @@ import ProductTabsSection from '../components/productTabSection'
 import NewsletterBanner from '../components/newsletterBanner'
 import Footer from '../components/footer'
 import FeaturesSection from '../components/featureSection'
-import ProductCard from './Cards'
+// import ProductCard from './Cards'
 
 function Home() {
   return (
@@ -21,7 +21,7 @@ function Home() {
    <ProductTabsSection/>
    <NewsletterBanner/>
    <FeaturesSection/>
-   <ProductCard/>
+   {/* <ProductCard/> */}
    <Footer/>
 
 

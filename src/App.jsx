@@ -4,7 +4,8 @@ import RegisterPage from './pages/register'
 import Home from './pages/Home'
 import { Route , Routes } from 'react-router-dom'
 import Shop from './pages/shop'
-import ProductDashboard from './Admin/productDashboard/ProductDashboard'; // correct
+// import ProductDashboard from './Admin/productDashboard/ProductDashboard'; // correct
+import AdminPanel from './Admin/AdminPanel'
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
       <Route path = "/register" element ={<RegisterPage/>}  />
       <Route path = "/home" element ={<Home/>}  />
       <Route path = "/shop" element ={<Shop/>}  />
-      <Route path = "/admin" element ={<ProductDashboard/>}  />
+      <Route path = "/admin" element ={<AdminPanel/>}  />
     </Routes>
  
   )

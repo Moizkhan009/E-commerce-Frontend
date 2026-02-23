@@ -1,24 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ShoppingCart, Heart, Phone, Menu, X, User, Home, Package, Info, FileText, Mail, LogIn } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link,useLocation } from 'react-router-dom';
 
 const Header = () => {
-  const [activeMenu, setActiveMenu] = useState('home');
+  // const [activeMenu, setActiveMenu] = useState('home');
+  const Location =useLocation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Check screen size on mount and resize
+  // useEffect(() => {
+  //   const checkScreenSize = () => {
+  //     setIsMobile(window.innerWidth < 1024);
+  //   };
+    
+  //   checkScreenSize();
+  //   window.addEventListener('resize', checkScreenSize);
+    
+  //   return () => window.removeEventListener('resize', checkScreenSize);
+  // }, []);
   useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
+  const checkScreenSize = () => {
+    setIsMobile(window.innerWidth < 1024);
+  };
+
+  checkScreenSize();
+  window.addEventListener('resize', checkScreenSize);
+
+  return () => {
+    window.removeEventListener('resize', checkScreenSize);
+  };
+}, []);
+
 
   const navigationItems = [
     { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" />, path: '/home' },
@@ -157,7 +171,9 @@ const Header = () => {
                   to={item.path}
                   onClick={() => setActiveMenu(item.id)}
                   className={`flex items-center gap-2 py-4 font-medium transition-colors ${
-                    activeMenu === item.id
+                    // activeMenu === item.id
+                    location.pathname==item.path
+
                       ? 'text-emerald-600 border-b-2 border-emerald-600'
                       : 'text-gray-700 hover:text-emerald-600'
                   }`}
@@ -186,7 +202,8 @@ const Header = () => {
               to={item.path}
               onClick={() => setActiveMenu(item.id)}
               className={`flex-shrink-0 flex items-center gap-2 px-4 py-3 font-medium text-sm transition-colors whitespace-nowrap ${
-                activeMenu === item.id
+                // activeMenu === item.id
+                location.pathname==item.path
                   ? 'text-emerald-600 border-b-2 border-emerald-600'
                   : 'text-gray-700 hover:text-emerald-600'
               }`}
@@ -250,7 +267,9 @@ const Header = () => {
                   setIsDrawerOpen(false);
                 }}
                 className={`flex items-center gap-3 w-full px-6 py-3 font-medium text-left transition-colors ${
-                  activeMenu === item.id
+                  // activeMenu === item.id
+                  location.pathname === item.path
+
                     ? 'text-emerald-600 bg-emerald-50'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}

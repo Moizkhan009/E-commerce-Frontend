@@ -4,9 +4,10 @@ import RegisterPage from './pages/register'
 import Home from './pages/Home'
 import { Route , Routes } from 'react-router-dom'
 import Shop from './pages/shop'
-// import ProductDashboard from './Admin/productDashboard/ProductDashboard'; // correct
 import AdminPanel from './Admin/AdminPanel'
-
+import AboutPage from './pages/About'
+import BlogPage from './pages/Blog'
+import ContactPage from './pages/Contact'
 function App() {
   return (
     <Routes>
@@ -15,7 +16,10 @@ function App() {
       <Route path = "/home" element ={<Home/>}  />
       <Route path = "/shop" element ={<Shop/>}  />
       <Route path = "/admin" element ={<AdminPanel/>}  />
-    </Routes>
+      <Route path="/About" element={<AboutPage/>} />
+      <Route path='/Blog' element={<BlogPage/>}/>
+      <Route path='/contact' element={<ContactPage/>} />
+      </Routes>
  
   )
 }

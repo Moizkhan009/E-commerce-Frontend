@@ -1,12 +1,21 @@
+import { addProduct, fetchProduct} from '../../redux/products/products_action';
+
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addProduct, fetchProduct } from '../../redux/products/products_action';
+// import { addProduct, fetchProduct } from '../redux/products/products_action';
+import { fetchCategories } from '../../redux/products/category_action'; // Import category action
 
 const ProductForm = ({ setShowProductForm, editingProduct }) => {
   const dispatch = useDispatch();
   
   // Status from Redux for loading state
   const status = useSelector((state) => state.product?.status);
+  
+  // Get categories from Redux store
+  const { categories, categoriesLoading } = useSelector((state) => ({
+    categories: state.category?.categories || [],
+    categoriesLoading: state.category?.status === 'loading'
+  }));
   
   const [formData, setFormData] = useState({
     name: '',
@@ -21,6 +30,17 @@ const ProductForm = ({ setShowProductForm, editingProduct }) => {
   });
 
   const [error, setError] = useState('');
+
+  // Fetch categories when component mounts
+  useEffect(() => {
+    console.log('Fetching categories for dropdown...');
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  // Debug: Log categories when they change
+  useEffect(() => {
+    console.log('Available categories:', categories);
+  }, [categories]);
 
   // Populate form if editing
   useEffect(() => {
@@ -69,6 +89,8 @@ const ProductForm = ({ setShowProductForm, editingProduct }) => {
       badge: formData.badge || '',
       badgeColor: formData.badgeColor || 'bg-gray-500'
     };
+
+    console.log('Submitting product:', newProduct);
 
     try {
       if (editingProduct) {
@@ -137,18 +159,34 @@ const ProductForm = ({ setShowProductForm, editingProduct }) => {
                 value={formData.category}
                 onChange={handleChange}
                 required
+                disabled={categoriesLoading}
               >
-                <option value="">Select a category</option>
-                <option value="Snack">Snack</option>
-                <option value="Meat">Meat</option>
-                <option value="Vegetables">Vegetables</option>
-                <option value="Fruits">Fruits</option>
-                <option value="Dairy">Dairy</option>
-                <option value="Beverages">Beverages</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Sports">Sports</option>
+                <option value="">
+                  {categoriesLoading ? 'Loading categories...' : 'Select a category'}
+                </option>
+                
+                {/* Dynamic categories from database */}
+                {categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <option key={cat._id || cat.id} value={cat.name}>
+                      {cat.image ? `${cat.image} ` : ''}{cat.name}
+                    </option>
+                  ))
+                ) : (
+                  !categoriesLoading && (
+                    <option value="" disabled>No categories available - Add one first!</option>
+                  )
+                )}
               </select>
+              
+              {/* Show category count */}
+              {categories.length > 0 && (
+                <small style={{color: '#10b981', fontSize: '12px', marginTop: '4px', display: 'block'}}>
+                  {categories.length} categories available
+                </small>
+              )}
             </div>
+            
             <div className="form-group">
               <label>Brand *</label>
               <input 

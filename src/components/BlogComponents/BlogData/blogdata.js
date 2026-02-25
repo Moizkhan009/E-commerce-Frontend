@@ -1,0 +1,113 @@
+// ─── Color Tokens ─────────────────────────────────────────────────────────
+export const T = {
+  green:      "#3BB77E",
+  greenDark:  "#28976A",
+  greenDeep:  "#1A6B4A",
+  greenLight: "#E8F8F1",
+  greenPale:  "#F2FBF6",
+  navy:       "#1D3557",
+  text:       "#4A5568",
+  textLight:  "#8A9BAE",
+  border:     "#E2ECE8",
+  offWhite:   "#F8FAFC",
+};
+
+// ─── Posts ────────────────────────────────────────────────────────────────
+export const POSTS = [
+  {
+    id: 1, featured: true, category: "Nutrition",
+    title: "The Ultimate Guide to Buying Fresh Organic Vegetables",
+    excerpt: "Discover how to pick the freshest organic produce at your local market. Learn what labels really mean and which veggies pack the most nutrition.",
+    content: `Organic vegetables have become increasingly popular as consumers grow more conscious about what they put in their bodies and how food is grown. But navigating the world of organic produce can be confusing.\n\nWhen shopping for organic vegetables, look for the USDA Organic seal, which guarantees that the product was grown without synthetic pesticides, herbicides, or fertilizers. This certification also means the soil has been free of prohibited substances for at least three years.\n\nSome vegetables are more important to buy organic than others. Leafy greens like spinach, kale, and lettuce tend to absorb more pesticides, making organic versions particularly worthwhile. Root vegetables like carrots and potatoes also benefit from organic farming since they grow directly in soil.\n\nFreshness is equally important as organic certification. When selecting vegetables, look for bright, vibrant colors and firm textures. Avoid anything with soft spots, discoloration, or wilting.\n\nLocal farmers markets are often your best bet for fresh organic produce. Not only is the food usually picked within 24-48 hours of sale, but you can also speak directly with the farmers about their growing practices.\n\nProper storage is just as important as smart shopping. Most leafy greens should be stored in the refrigerator in a breathable bag. Root vegetables do well in cool, dark places.\n\nRemember: eating more vegetables of any kind is always a positive step for your health.`,
+    tags: ["organic", "vegetables", "healthy eating", "farming"],
+    author: { name: "Sara Mitchell", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80", role: "Nutritionist" },
+    date: "Jan 15, 2026", readTime: "5 min",
+    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=900&q=85",
+  },
+  {
+    id: 2, featured: false, category: "Cooking Tips",
+    title: "Meal Prep for Beginners: Save Time & Eat Better Every Week",
+    excerpt: "Start your meal prep journey with these simple strategies. Cook once, eat well all week with minimal effort and maximum flavour.",
+    content: "Full content here...",
+    tags: ["meal prep", "time saving", "cooking"],
+    author: { name: "Hi. Merinda", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80", role: "Chef" },
+    date: "Jan 22, 2026", readTime: "7 min",
+    image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=900&q=85",
+  },
+  {
+    id: 3, featured: false, category: "Nutrition",
+    title: "Top 10 Superfoods You Need in Your Diet This Year",
+    excerpt: "From ancient grains to modern discoveries, these powerhouse foods are taking the nutrition world by storm.",
+    content: "Full content here...",
+    tags: ["superfoods", "health", "diet"],
+    author: { name: "James Okafor", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80", role: "Health Writer" },
+    date: "Feb 1, 2026", readTime: "6 min",
+    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=900&q=85",
+  },
+  {
+    id: 4, featured: false, category: "Seasonal",
+    title: "Seasonal Eating: Why Spring Produce is the Best Right Now",
+    excerpt: "Spring brings an abundance of fresh, flavourful produce. Here is how to make the most of the season finest offerings.",
+    content: "Full content here...",
+    tags: ["seasonal", "spring", "fresh produce"],
+    author: { name: "Sara Mitchell", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80", role: "Nutritionist" },
+    date: "Feb 5, 2026", readTime: "4 min",
+    image: "https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=900&q=85",
+  },
+  {
+    id: 5, featured: false, category: "Shopping Tips",
+    title: "8 Smart Ways to Slash Your Grocery Bill Without Sacrificing Quality",
+    excerpt: "Eating well does not have to break the bank. These proven strategies will help you shop smarter and waste less.",
+    content: "Full content here...",
+    tags: ["budget", "saving", "grocery shopping"],
+    author: { name: "Dilan Specter", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80", role: "Food Economist" },
+    date: "Feb 10, 2026", readTime: "8 min",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=85",
+  },
+  {
+    id: 6, featured: false, category: "Health",
+    title: "Fermented Foods and Gut Health: What the Science Actually Says",
+    excerpt: "Kombucha, kimchi, kefir — fermented foods are everywhere. But do they really improve gut health?",
+    content: "Full content here...",
+    tags: ["gut health", "fermented", "probiotics"],
+    author: { name: "Hi. Merinda", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80", role: "Chef" },
+    date: "Feb 14, 2026", readTime: "5 min",
+    image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=900&q=85",
+  },
+  {
+    id: 7, featured: false, category: "Recipes",
+    title: "5 Quick Healthy Smoothie Bowls to Kickstart Your Morning",
+    excerpt: "These vibrant smoothie bowls are packed with nutrients, ready in under 10 minutes, and taste incredible every time.",
+    content: "Full content here...",
+    tags: ["smoothie", "breakfast", "healthy"],
+    author: { name: "James Okafor", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80", role: "Health Writer" },
+    date: "Feb 18, 2026", readTime: "3 min",
+    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900&q=85",
+  },
+  {
+    id: 8, featured: false, category: "Health",
+    title: "Why Eating Local is Better for You and the Planet",
+    excerpt: "Local food is not just a trend — it supports farmers, reduces emissions, and puts fresher food on your table.",
+    content: "Full content here...",
+    tags: ["local", "sustainable", "environment"],
+    author: { name: "Dilan Specter", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80", role: "Food Economist" },
+    date: "Feb 19, 2026", readTime: "6 min",
+    image: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=900&q=85",
+  },
+];
+
+export const CATEGORIES = [
+  { name: "All",           count: POSTS.length },
+  { name: "Nutrition",     count: 12 },
+  { name: "Cooking Tips",  count: 8  },
+  { name: "Seasonal",      count: 6  },
+  { name: "Shopping Tips", count: 5  },
+  { name: "Health",        count: 9  },
+  { name: "Recipes",       count: 14 },
+];
+
+export const TAGS = [
+  "organic", "vegetables", "meal prep", "superfoods",
+  "seasonal", "budget", "gut health", "probiotics",
+  "farming", "diet", "smoothie", "local",
+];

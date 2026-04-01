@@ -45,9 +45,9 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchProduct, addProduct, deleteProduct } from "./products_action";
 
 const initialState = {
-  product: {
-    products: [], // Products array - yahan sab products store honge
-  },
+  
+products: [], // Products array - yahan sab products store honge
+  
   status: "idle",
   error: null,
 };
@@ -65,22 +65,22 @@ const productSlice = createSlice({
       })
       .addCase(fetchProduct.fulfilled, (state, action) => {
         state.status = "succeeded";
-        
+        state.products.push(action.payload);
         // Different API response structures ko handle karo
         if (Array.isArray(action.payload)) {
           // Agar direct array aaya
-          state.product.products = action.payload;
+          state.products = action.payload;
         } else if (action.payload?.products && Array.isArray(action.payload.products)) {
           // Agar { products: [...] } format mein aaya
-          state.product.products = action.payload.products;
+          state.products = action.payload.products;
         } else if (action.payload?.data && Array.isArray(action.payload.data)) {
           // Agar { data: [...] } format mein aaya
-          state.product.products = action.payload.data;
+          state.products = action.payload.data;
         } else if (action.payload && typeof action.payload === 'object') {
           // Agar single product object aaya, usko array mein convert karo
-          state.product.products = [action.payload];
+          state.products = [action.payload];
         } else {
-          state.product.products = [];
+          state.products = [];
         }
       })
       .addCase(fetchProduct.rejected, (state, action) => {

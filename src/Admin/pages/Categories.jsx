@@ -17,7 +17,12 @@ const Categories = ({ setShowCategoryForm, setSelectedCategory, setEditingCatego
   //   status: state.category?.status,
   //   error: state.category?.error
   // }));
- const categories = useSelector((state) => state.category.categories);
+const { categories, categoryProducts, status, error } = useSelector((state) => ({
+  categories: state.category?.categories || [],
+  categoryProducts: state.category?.categoryProducts || [],
+  status: state.category?.status,
+  error: state.category?.error
+}));
  console.log( "categories",categories);
  
   // Temporary dummy data (Redux connect karne tak)
@@ -26,9 +31,8 @@ const Categories = ({ setShowCategoryForm, setSelectedCategory, setEditingCatego
   //   { _id: '2', name: 'Snacks', image: '🍿', description: 'Snack items' },
   //   { _id: '3', name: 'Fruits', image: '🍎', description: 'Fresh fruits' },
   // ];
-  const categoryProducts = [];
-  const status = 'succeeded';
-  const error = null;
+  // const categoryProducts = [];
+
 
   // Component mount par categories fetch karo
   useEffect(() => {
@@ -69,7 +73,7 @@ const Categories = ({ setShowCategoryForm, setSelectedCategory, setEditingCatego
     
     // Fetch products for this category
     try {
-      await dispatch(getProductsByCategory(category.name)).unwrap();
+      await dispatch(getProductsByCategory(category._id)).unwrap();
     } catch (err) {
       console.error('Error fetching products:', err);
     }
@@ -106,6 +110,8 @@ const Categories = ({ setShowCategoryForm, setSelectedCategory, setEditingCatego
       </div>
     );
   }
+
+ 
 
   return (
     <div>
@@ -174,66 +180,93 @@ const Categories = ({ setShowCategoryForm, setSelectedCategory, setEditingCatego
       )}
 
       {/* PRODUCTS VIEW (Specific Category) */}
-      {viewMode === 'products' && currentCategory && (
-        <>
-          <div className="page-header">
-            <div className="category-breadcrumb">
-              <button 
-                className="back-btn" 
-                onClick={handleBackToCategories}
-              >
-                <ArrowLeft size={20} />
-                Back to Categories
-              </button>
-              <h1 className="page-title">
-                {currentCategory.image} {currentCategory.name} Products
-              </h1>
-            </div>
-            <button 
-              className="add-btn" 
-              onClick={handleAddProductToCategory}
-            >
-              <Plus size={20} />
-              Add Product to {currentCategory.name}
-            </button>
-          </div>
+{viewMode === 'products' && currentCategory && (
+  <>
+    <div className="page-header">
+      <div className="category-breadcrumb">
+        <button 
+          className="back-btn" 
+          onClick={handleBackToCategories}
+        >
+          <ArrowLeft size={20} />
+          Back to Categories
+        </button>
 
-          <div className="content-card">
-            {status === 'loading' ? (
-              <div className="loading-message">Loading products...</div>
-            ) : categoryProducts.length === 0 ? (
-              <div className="empty-message">
-                <Package size={48} />
-                <p>No products in {currentCategory.name} yet!</p>
-                <p className="text-sm">Click "Add Product" to add items to this category.</p>
+        <h1 className="page-title">
+          {currentCategory.image} {currentCategory.name} Products
+        </h1>
+      </div>
+
+      <button 
+        className="add-btn" 
+        onClick={handleAddProductToCategory}
+      >
+        <Plus size={20} />
+        Add Product to {currentCategory.name}
+      </button>
+    </div>
+
+    <div className="content-card">
+      {status === 'loading' ? (
+        <div className="loading-message">Loading products...</div>
+
+      ) : categoryProducts.length === 0 ? (
+        <div className="empty-message">
+          <Package size={48} />
+          <p>No products in {currentCategory.name} yet!</p>
+          <p className="text-sm">
+            Click "Add Product" to add items to this category.
+          </p>
+        </div>
+
+      ) : (
+        <div className="products-grid">
+          {categoryProducts.map((product) => (
+            <div 
+              key={product._id || product.id} 
+              className="product-card"
+            >
+              <div className="product-image-container">
+                <div className="product-image">
+                  {product.image}
+                </div>
               </div>
-            ) : (
-              <div className="products-grid">
-                {categoryProducts.map((product) => (
-                  <div key={product._id || product.id} className="product-card">
-                    <div className="product-image-container">
-                      <div className="product-image">{product.image}</div>
-                    </div>
-                    <div className="product-details">
-                      <p className="product-category">{product.category}</p>
-                      <h3 className="product-name">{product.name}</h3>
-                      <p className="product-brand">By {product.brand}</p>
-                      <div className="product-price-row">
-                        <span className="product-price">${product.price}</span>
-                        {product.originalPrice > product.price && (
-                          <span className="product-original-price">
-                            ${product.originalPrice}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+
+              <div className="product-details">
+                
+                {/* ✅ FIXED CATEGORY NAME */}
+                <p className="product-category">
+                  {product.category?.name || 'No Category'}
+                </p>
+
+                <h3 className="product-name">
+                  {product.name}
+                </h3>
+
+                <p className="product-brand">
+                  By {product.brand}
+                </p>
+
+                <div className="product-price-row">
+                  <span className="product-price">
+                    ${product.price}
+                  </span>
+
+                  {product.originalPrice > product.price && (
+                    <span className="product-original-price">
+                      ${product.originalPrice}
+                    </span>
+                  )}
+                </div>
+
               </div>
-            )}
-          </div>
-        </>
+            </div>
+          ))}
+        </div>
       )}
+    </div>
+  </>
+)}
 
       {/* Product Form Modal for Adding to Category */}
       {showProductForm && (

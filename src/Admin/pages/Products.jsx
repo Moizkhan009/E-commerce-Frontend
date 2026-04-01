@@ -7,11 +7,17 @@ const Products = ({ setShowProductForm, setEditingProduct }) => {
   const dispatch = useDispatch();
   
   // Redux state se products fetch karo - EXACTLY tumhare logic ke mutabiq
-  const { products, status, error } = useSelector((state) => ({
-    products: state.product?.product?.products || [],
+  const { states , products, status, error  } = useSelector((state) => ({
+    
+    states : state,
+    products: state.products,
     status: state.product?.status,
     error: state.product?.error
   }));
+
+console.log(states);
+
+  
 
   // Component mount hone par products fetch karo
   useEffect(() => {
@@ -68,6 +74,10 @@ const Products = ({ setShowProductForm, setEditingProduct }) => {
     }
     return stars;
   };
+
+
+  console.log(products);
+  
 
   // Loading State
   if (status === 'loading') {

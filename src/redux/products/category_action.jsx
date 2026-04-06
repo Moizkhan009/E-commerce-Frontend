@@ -106,28 +106,21 @@ export const deleteCategory = createAsyncThunk(
 // ============ GET PRODUCTS BY CATEGORY ============
 export const getProductsByCategory = createAsyncThunk(
   "category/getProductsByCategory",
-  async (categoryName) => {
+  async (categoryId, { rejectWithValue }) => {
     try {
-      // Products ko filter karo by category
-      const response = await fetch("http://localhost:5000/api/getProduct");
-      
+      const response = await fetch(
+        `http://localhost:5000/api/products/${categoryId}`
+      );
+
       if (!response.ok) {
-        throw new Error("Failed to fetch products");
+        throw new Error("Failed to fetch category products");
       }
 
       const data = await response.json();
-      
-      // Filter products by category
-      const products = data.products || data;
-      const filteredProducts = products.filter(
-        product => product.category === categoryName
-      );
-      
-      console.log(`Products in ${categoryName}:`, filteredProducts);
-      return { categoryName, products: filteredProducts };
+
+      return data.products; // ✅ direct products return karo
     } catch (error) {
-      console.log("Get Products By Category Error:", error.message);
-      throw error;
+      return rejectWithValue(error.message);
     }
   }
 );

@@ -9,6 +9,7 @@ import {
 
 const initialState = {
   categories: [],
+
   selectedCategory: null,
   categoryProducts: [],
   status: "idle",
@@ -87,7 +88,7 @@ const categorySlice = createSlice({
       })
       .addCase(getProductsByCategory.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.selectedCategory = action.payload.categoryName;
+        
         state.categoryProducts = action.payload.products;
       })
       .addCase(getProductsByCategory.rejected, (state, action) => {

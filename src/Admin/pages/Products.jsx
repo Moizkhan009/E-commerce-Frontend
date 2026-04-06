@@ -1,58 +1,47 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Package, Trash2, Edit, Star } from 'lucide-react';
-import { addProduct, fetchProduct } from '../../redux/products/products_action';
-
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Package, Trash2, Edit, Star } from "lucide-react";
+import { addProduct, fetchProduct, deleteProduct } from "../../redux/products/products_action";
 const Products = ({ setShowProductForm, setEditingProduct }) => {
-  const dispatch = useDispatch();
-  
-  // Redux state se products fetch karo - EXACTLY tumhare logic ke mutabiq
-  const { states , products, status, error  } = useSelector((state) => ({
-    
-    states : state,
-    products: state.products,
-    status: state.product?.status,
-    error: state.product?.error
-  }));
+ const dispatch = useDispatch();
 
-console.log(states);
+const { products, status, error } = useSelector((state) => state.product);
 
-  
+useEffect(() => {
+  dispatch(fetchProduct());
+}, [dispatch]);
 
-  // Component mount hone par products fetch karo
-  useEffect(() => {
-    dispatch(fetchProduct());
-  }, [dispatch]);
+console.log(products);
 
   // Add Product Handler
   const handleAddProduct = () => {
-    console.log('Add Product clicked');
-    if (setEditingProduct && typeof setEditingProduct === 'function') {
+    console.log("Add Product clicked");
+    if (setEditingProduct && typeof setEditingProduct === "function") {
       setEditingProduct(null);
     }
-    if (setShowProductForm && typeof setShowProductForm === 'function') {
+    if (setShowProductForm && typeof setShowProductForm === "function") {
       setShowProductForm(true);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+    if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         await dispatch(deleteProduct(id)).unwrap();
-        alert('Product deleted successfully!');
+        alert("Product deleted successfully!");
       } catch (err) {
-        console.error('Error deleting product:', err);
-        alert('Error deleting product: ' + err.message);
+        console.error("Error deleting product:", err);
+        alert("Error deleting product: " + err.message);
       }
     }
   };
 
   const handleEdit = (product) => {
-    console.log('Edit clicked for product:', product);
-    if (setEditingProduct && typeof setEditingProduct === 'function') {
+    console.log("Edit clicked for product:", product);
+    if (setEditingProduct && typeof setEditingProduct === "function") {
       setEditingProduct(product);
     }
-    if (setShowProductForm && typeof setShowProductForm === 'function') {
+    if (setShowProductForm && typeof setShowProductForm === "function") {
       setShowProductForm(true);
     }
   };
@@ -61,12 +50,16 @@ console.log(states);
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
-    
+
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
+      stars.push(
+        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />,
+      );
     }
     if (hasHalfStar) {
-      stars.push(<Star key="half" className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
+      stars.push(
+        <Star key="half" className="w-4 h-4 fill-yellow-400 text-yellow-400" />,
+      );
     }
     const emptyStars = 5 - Math.ceil(rating);
     for (let i = 0; i < emptyStars; i++) {
@@ -74,13 +67,11 @@ console.log(states);
     }
     return stars;
   };
-
-
-  console.log(products);
   
+  console.log(products);
 
   // Loading State
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div>
         <h1 className="page-title">Products Management</h1>
@@ -90,7 +81,7 @@ console.log(states);
   }
 
   // Error State
-  if (status === 'failed') {
+  if (status === "failed") {
     return (
       <div>
         <h1 className="page-title">Products Management</h1>
@@ -109,7 +100,7 @@ console.log(states);
         </button>
       </div>
       <div className="content-card">
-        {status === 'succeeded' && products.length === 0 ? (
+        {status === "succeeded" && products.length === 0 ? (
           <div className="empty-message">
             <Package size={48} />
             <p>No products found. Add your first product!</p>
@@ -129,7 +120,7 @@ console.log(states);
                   <div className="product-image">{product.image}</div>
                 </div>
                 <div className="product-details">
-                  <p className="product-category">{product.category}</p>
+                  <p className="product-category">{product.category.name}</p>
                   <h3 className="product-name">{product.name}</h3>
                   <p className="product-brand">By {product.brand}</p>
                   <div className="product-rating">
@@ -139,18 +130,20 @@ console.log(states);
                   <div className="product-price-row">
                     <span className="product-price">${product.price}</span>
                     {product.originalPrice > product.price && (
-                      <span className="product-original-price">${product.originalPrice}</span>
+                      <span className="product-original-price">
+                        ${product.originalPrice}
+                      </span>
                     )}
                   </div>
                   <div className="action-buttons">
-                    <button 
+                    <button
                       className="edit-btn"
                       onClick={() => handleEdit(product)}
                       title="Edit"
                     >
                       <Edit size={16} />
                     </button>
-                    <button 
+                    <button
                       className="delete-btn"
                       onClick={() => handleDelete(product._id || product.id)}
                       title="Delete"

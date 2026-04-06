@@ -1,53 +1,8 @@
-// import { createSlice } from "@reduxjs/toolkit";
-// import { fetchProduct } from "./products_action";
-
-// const initialState = {
-//   product: {
-//     name: "",
-//     category: "",
-//     brand: "",
-//     image: "",
-//     price: 0,
-//     originalPrice: 0,
-//     rating: 0,
-//     badge: "",
-//     badgeColor: "",
-//   },
-//   status: "idle",
-//   error: null,
-// };
-
-// const productSlice = createSlice({
-//   name: "product",
-//   initialState,
-//   reducers: {
-//     },
-//   extraReducers: (builder) => {
-//     builder
-//       .addCase(fetchProduct.pending, (state) => {
-//         state.status = "loading";
-//         state.error = null;
-//       })
-//       .addCase(fetchProduct.fulfilled, (state, action) => {
-//         state.status = "succeeded";
-//         state.product = action.payload;
-//       })
-//       .addCase(fetchProduct.rejected, (state, action) => {
-//         state.status = "failed";
-//         state.error = action.error.message; // 👈 from thrown error
-//       });
-//   },
-// });
-
-// export default productSlice.reducer;
-
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchProduct, addProduct, deleteProduct } from "./products_action";
 
 const initialState = {
-  
-products: [], // Products array - yahan sab products store honge
-  
+  products: [],
   status: "idle",
   error: null,
 };
@@ -58,6 +13,7 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+
       // ============ FETCH PRODUCTS ============
       .addCase(fetchProduct.pending, (state) => {
         state.status = "loading";
@@ -65,29 +21,26 @@ const productSlice = createSlice({
       })
       .addCase(fetchProduct.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.products.push(action.payload);
-        // Different API response structures ko handle karo
-        if (Array.isArray(action.payload)) {
-          // Agar direct array aaya
-          state.products = action.payload;
-        } else if (action.payload?.products && Array.isArray(action.payload.products)) {
-          // Agar { products: [...] } format mein aaya
-          state.products = action.payload.products;
-        } else if (action.payload?.data && Array.isArray(action.payload.data)) {
-          // Agar { data: [...] } format mein aaya
-          state.products = action.payload.data;
-        } else if (action.payload && typeof action.payload === 'object') {
-          // Agar single product object aaya, usko array mein convert karo
-          state.products = [action.payload];
+
+        const payload = action.payload;
+
+        if (Array.isArray(payload)) {
+          state.products = payload;
+        } else if (payload?.products && Array.isArray(payload.products)) {
+          state.products = payload.products;
+        } else if (payload?.data && Array.isArray(payload.data)) {
+          state.products = payload.data;
+        } else if (payload && typeof payload === "object") {
+          state.products = [payload];
         } else {
           state.products = [];
         }
       })
       .addCase(fetchProduct.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.error?.message || "Something went wrong";
       })
-      
+
       // ============ ADD PRODUCT ============
       .addCase(addProduct.pending, (state) => {
         state.status = "loading";
@@ -95,23 +48,36 @@ const productSlice = createSlice({
       })
       .addCase(addProduct.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // Naya product array mein add karo
-        state.product.products.push(action.payload);
+
+        // Ensure products array exists
+        if (!Array.isArray(state.products)) {
+          state.products = [];
+        }
+
+        state.products.push(action.payload);
       })
       .addCase(addProduct.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.error?.message || "Add product failed";
       })
-      
-      // ============ DELETE PRODUCT (BONUS) ============
+
+      // ============ DELETE PRODUCT ============
+      .addCase(deleteProduct.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        // Product ko ID se filter karke remove karo
-        state.product.products = state.product.products.filter(
-          (product) => product._id !== action.payload && product.id !== action.payload
+        state.status = "succeeded";
+
+        const id = action.payload;
+
+        state.products = state.products.filter(
+          (product) => product._id !== id && product.id !== id
         );
       })
       .addCase(deleteProduct.rejected, (state, action) => {
-        state.error = action.error.message;
+        state.status = "failed";
+        state.error = action.error?.message || "Delete failed";
       });
   },
 });

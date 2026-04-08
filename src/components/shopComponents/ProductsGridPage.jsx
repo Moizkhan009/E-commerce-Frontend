@@ -16,7 +16,7 @@ const ProductsGridPage = () => {
   const { product, status, error } = useSelector(
     (state) => state.product
   );
-  console.log(product.products);
+  console.log(product);
   
   useEffect(() => {
     dispatch(fetchProduct());

@@ -184,7 +184,7 @@ const AdminPanel = () => {
           top: 0;
           width: 4px;
           height: 100%;
-          background: linear-gradient(135deg, #059669 0%, #047857 100%);
+          background: linear-gradient(135deg, #dcfce7 0%, #047857 100%);
           transform: scaleY(0);
           transition: transform 0.3s;
         }

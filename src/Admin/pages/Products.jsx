@@ -1,19 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Package, Trash2, Edit, Star } from "lucide-react";
+import { Package, Trash2, Edit, Star, Search } from "lucide-react";
 import { addProduct, fetchProduct, deleteProduct } from "../../redux/products/products_action";
+
 const Products = ({ setShowProductForm, setEditingProduct }) => {
- const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const [searchQuery, setSearchQuery] = useState("");
 
-const { products, status, error } = useSelector((state) => state.product);
+  const { products, status, error } = useSelector((state) => state.product);
 
-useEffect(() => {
-  dispatch(fetchProduct());
-}, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchProduct());
+  }, [dispatch]);
 
-console.log(products);
+  console.log(products);
 
-  // Add Product Handler
   const handleAddProduct = () => {
     console.log("Add Product clicked");
     if (setEditingProduct && typeof setEditingProduct === "function") {
@@ -53,12 +54,12 @@ console.log(products);
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
-        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />,
+        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
       );
     }
     if (hasHalfStar) {
       stars.push(
-        <Star key="half" className="w-4 h-4 fill-yellow-400 text-yellow-400" />,
+        <Star key="half" className="w-4 h-4 fill-yellow-400 text-yellow-400" />
       );
     }
     const emptyStars = 5 - Math.ceil(rating);
@@ -67,15 +68,24 @@ console.log(products);
     }
     return stars;
   };
-  
+
   console.log(products);
+
+  const filteredProducts = (products || []).filter((p) =>
+    p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Loading State
   if (status === "loading") {
     return (
       <div>
         <h1 className="page-title">Products Management</h1>
-        <div className="loading-message">Loading products...</div>
+        <div className="flex items-center gap-3 text-gray-500 text-sm mt-4">
+          <div className="w-5 h-5 border-2 border-gray-300 border-t-green-600 rounded-full animate-spin" />
+          Loading products...
+        </div>
       </div>
     );
   }
@@ -85,13 +95,16 @@ console.log(products);
     return (
       <div>
         <h1 className="page-title">Products Management</h1>
-        <div className="error-message">Error: {error}</div>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm mt-4">
+          Error: {error}
+        </div>
       </div>
     );
   }
 
   return (
     <div>
+      {/* Header — original */}
       <div className="page-header">
         <h1 className="page-title">Products Management</h1>
         <button className="add-btn" onClick={handleAddProduct}>
@@ -99,62 +112,110 @@ console.log(products);
           Add Product
         </button>
       </div>
-      <div className="content-card">
+
+      {/* Full-width Search Bar */}
+      <div className="relative w-full mb-4">
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search by name, brand or category..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-green-400 focus:ring-1 focus:ring-green-100 text-gray-700 bg-white"
+        />
+      </div>
+
+      {/* List */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+
         {status === "succeeded" && products.length === 0 ? (
-          <div className="empty-message">
-            <Package size={48} />
-            <p>No products found. Add your first product!</p>
+          <div className="flex flex-col items-center gap-3 py-16 text-gray-300">
+            <Package size={40} strokeWidth={1.5} />
+            <p className="text-sm text-gray-400">No products found. Add your first product!</p>
           </div>
         ) : (
-          <div className="products-grid">
-            {products.map((product) => (
-              <div key={product._id || product.id} className="product-card">
-                {product.badge && (
-                  <div className="product-badge-container">
-                    <span className={`product-badge ${product.badgeColor}`}>
-                      {product.badge}
-                    </span>
+          <>
+            {/* Table Header */}
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_100px] px-4 py-2.5 bg-green-50 border-b border-green-100 text-xs font-semibold text-green-700 uppercase tracking-wide">
+              <span>Product</span>
+              <span>Category</span>
+              <span>Badge</span>
+              <span>Rating</span>
+              <span>Price</span>
+              <span className="text-right">Actions</span>
+            </div>
+
+            {filteredProducts.length === 0 ? (
+              <div className="flex flex-col items-center gap-3 py-16 text-gray-300">
+                <Package size={40} strokeWidth={1.5} />
+                <p className="text-sm text-gray-400">No products match your search.</p>
+              </div>
+            ) : (
+              filteredProducts.map((product) => (
+                <div
+                  key={product._id || product.id}
+                  className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_100px] items-center px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-green-50 transition-colors"
+                >
+                  {/* Image + Name + Brand */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-lg flex-shrink-0">
+                      {product.image || "📦"}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">{product.name}</p>
+                      <p className="text-xs text-gray-400">By {product.brand}</p>
+                    </div>
                   </div>
-                )}
-                <div className="product-image-container">
-                  <div className="product-image">{product.image}</div>
-                </div>
-                <div className="product-details">
-                  <p className="product-category">{product.category.name}</p>
-                  <h3 className="product-name">{product.name}</h3>
-                  <p className="product-brand">By {product.brand}</p>
-                  <div className="product-rating">
-                    {renderStars(product.rating)}
-                    <span className="rating-value">({product.rating})</span>
-                  </div>
-                  <div className="product-price-row">
-                    <span className="product-price">${product.price}</span>
-                    {product.originalPrice > product.price && (
-                      <span className="product-original-price">
-                        ${product.originalPrice}
+
+                  {/* Category */}
+                  <span className="text-sm text-gray-500">{product.category.name}</span>
+
+                  {/* Badge */}
+                  <div>
+                    {product.badge ? (
+                      <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${product.badgeColor || "bg-green-100 text-green-700"}`}>
+                        {product.badge}
                       </span>
+                    ) : (
+                      <span className="text-xs text-gray-300">—</span>
                     )}
                   </div>
-                  <div className="action-buttons">
+
+                  {/* Rating */}
+                  <div className="flex items-center gap-0.5">
+                    {renderStars(product.rating)}
+                    <span className="text-xs text-gray-400 ml-1">({product.rating})</span>
+                  </div>
+
+                  {/* Price */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-800">${product.price}</span>
+                    {product.originalPrice > product.price && (
+                      <span className="text-xs text-gray-300 line-through">${product.originalPrice}</span>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-1.5 justify-end">
                     <button
-                      className="edit-btn"
                       onClick={() => handleEdit(product)}
                       title="Edit"
+                      className="w-7 h-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-500 hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition-colors"
                     >
-                      <Edit size={16} />
+                      <Edit size={13} />
                     </button>
                     <button
-                      className="delete-btn"
                       onClick={() => handleDelete(product._id || product.id)}
                       title="Delete"
+                      className="w-7 h-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-colors"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))
+            )}
+          </>
         )}
       </div>
     </div>

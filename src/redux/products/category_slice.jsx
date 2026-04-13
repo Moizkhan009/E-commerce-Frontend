@@ -9,7 +9,6 @@ import {
 
 const initialState = {
   categories: [],
-
   selectedCategory: null,
   categoryProducts: [],
   status: "idle",
@@ -25,6 +24,9 @@ const categorySlice = createSlice({
     },
     clearCategoryProducts: (state) => {
       state.categoryProducts = [];
+    },
+    clearError: (state) => {
+      state.error = null;
     }
   },
   extraReducers: (builder) => {
@@ -36,8 +38,6 @@ const categorySlice = createSlice({
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.status = "succeeded";
-        
-        // Handle different response formats
         if (Array.isArray(action.payload)) {
           state.categories = action.payload;
         } else if (action.payload?.categories) {
@@ -48,7 +48,7 @@ const categorySlice = createSlice({
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       })
       
       // ============ ADD CATEGORY ============
@@ -58,28 +58,48 @@ const categorySlice = createSlice({
       })
       .addCase(addCategory.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.categories.push(action.payload);
+        if (action.payload) {
+          state.categories.push(action.payload);
+        }
       })
       .addCase(addCategory.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       })
       
       // ============ UPDATE CATEGORY ============
+      .addCase(updateCategory.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
       .addCase(updateCategory.fulfilled, (state, action) => {
+        state.status = "succeeded";
         const index = state.categories.findIndex(
-          cat => cat._id === action.payload._id
+          cat => cat._id === action.payload?._id
         );
         if (index !== -1) {
           state.categories[index] = action.payload;
         }
       })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || action.error.message;
+      })
       
       // ============ DELETE CATEGORY ============
+      .addCase(deleteCategory.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
       .addCase(deleteCategory.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.categories = state.categories.filter(
-          cat => cat._id !== action.payload && cat.id !== action.payload
+          cat => cat._id !== action.payload
         );
+      })
+      .addCase(deleteCategory.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || action.error.message;
       })
       
       // ============ GET PRODUCTS BY CATEGORY ============
@@ -88,15 +108,26 @@ const categorySlice = createSlice({
       })
       .addCase(getProductsByCategory.fulfilled, (state, action) => {
         state.status = "succeeded";
-        
-        state.categoryProducts = action.payload.products;
+        if (Array.isArray(action.payload)) {
+          state.categoryProducts = action.payload;
+        } else if (action.payload?.products) {
+          state.categoryProducts = action.payload.products;
+        } else {
+          state.categoryProducts = [];
+        }
       })
       .addCase(getProductsByCategory.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
+        state.categoryProducts = [];
       });
   },
 });
 
-export const { setSelectedCategory, clearCategoryProducts } = categorySlice.actions;
+export const { 
+  setSelectedCategory, 
+  clearCategoryProducts, 
+  clearError 
+} = categorySlice.actions;
+
 export default categorySlice.reducer;

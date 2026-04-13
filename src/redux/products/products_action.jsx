@@ -28,6 +28,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 export const fetchProduct = createAsyncThunk(
   "product/fetchProduct",
   async () => {
+    console.log("run");
+    
     try {
       const response = await fetch("http://localhost:5000/api/getProduct");
       console.log("response from action", response);

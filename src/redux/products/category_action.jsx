@@ -1,23 +1,35 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+const API_URL = "http://localhost:5000/api/category";
+
 // ============ FETCH CATEGORIES ============
 export const fetchCategories = createAsyncThunk(
   "category/fetchCategories",
-  async () => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:5000/api/category/Get");
-      console.log("Fetch Categories Response:", response);
-       
+      console.log("Fetching categories from:", `${API_URL}/categories`);
+      const response = await fetch(`${API_URL}/categories`);
+      
+      console.log("Response status:", response.status);
+
       if (!response.ok) {
-        throw new Error("Failed to fetch categories");
+        throw new Error(`HTTP ${response.status}: Failed to fetch categories`);
       }
 
       const data = await response.json();
-      console.log("Fetched Categories:", data);
-      return data;
+      console.log("Fetched data:", data);
+      
+      // ✅ Handle different response structures
+      if (data.categories && Array.isArray(data.categories)) {
+        return data.categories;
+      } else if (Array.isArray(data)) {
+        return data;
+      } else {
+        return [];
+      }
     } catch (error) {
-      console.log("Fetch Categories Error:", error.message);
-      throw error;
+      console.error("Fetch Categories Error:", error);
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -25,9 +37,9 @@ export const fetchCategories = createAsyncThunk(
 // ============ ADD CATEGORY ============
 export const addCategory = createAsyncThunk(
   "category/addCategory",
-  async (categoryData) => {
+  async (categoryData, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:5000/api/category/addCategory", {
+      const response = await fetch(`${API_URL}/addCategory`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,19 +47,15 @@ export const addCategory = createAsyncThunk(
         body: JSON.stringify(categoryData),
       });
 
-      console.log("Add Category Response:", response);
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to add category");
       }
 
       const data = await response.json();
-      console.log("Category Added Successfully:", data);
-      return data.category;
+      return data.category || data;
     } catch (error) {
-      console.log("Add Category Error:", error.message);
-      throw error;
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -55,9 +63,9 @@ export const addCategory = createAsyncThunk(
 // ============ UPDATE CATEGORY ============
 export const updateCategory = createAsyncThunk(
   "category/updateCategory",
-  async ({ id, data }) => {
+  async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${id}`, {
+      const response = await fetch(`${API_URL}/categories/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -71,11 +79,9 @@ export const updateCategory = createAsyncThunk(
       }
 
       const result = await response.json();
-      console.log("Category Updated Successfully:", result);
-      return result.category;
+      return result.category || result;
     } catch (error) {
-      console.log("Update Category Error:", error.message);
-      throw error;
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -83,9 +89,9 @@ export const updateCategory = createAsyncThunk(
 // ============ DELETE CATEGORY ============
 export const deleteCategory = createAsyncThunk(
   "category/deleteCategory",
-  async (categoryId) => {
+  async (categoryId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+      const response = await fetch(`${API_URL}/categories/${categoryId}`, {
         method: "DELETE",
       });
 
@@ -94,11 +100,9 @@ export const deleteCategory = createAsyncThunk(
         throw new Error(errorData.message || "Failed to delete category");
       }
 
-      console.log("Category Deleted Successfully");
       return categoryId;
     } catch (error) {
-      console.log("Delete Category Error:", error.message);
-      throw error;
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -108,17 +112,19 @@ export const getProductsByCategory = createAsyncThunk(
   "category/getProductsByCategory",
   async (categoryId, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/products/${categoryId}`
-      );
+      console.log("Fetching products for category:", categoryId);
+      const response = await fetch(`http://localhost:5000/api/products/category/${categoryId}`);
+      
+      console.log("Products response status:", response.status);
 
       if (!response.ok) {
         throw new Error("Failed to fetch category products");
       }
 
       const data = await response.json();
-
-      return data.products; // ✅ direct products return karo
+      console.log("Products data:", data);
+      
+      return data.products || data;
     } catch (error) {
       return rejectWithValue(error.message);
     }

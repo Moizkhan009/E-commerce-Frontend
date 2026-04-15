@@ -9,17 +9,13 @@ const ProductsGridPage = () => {
   const [showCount, setShowCount] = useState(50);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const dispatch = useDispatch();
-  
 
- 
   const { products, status, error } = useSelector((state) => state.product);
   console.log(products);
 
-     useEffect(() => {
+  useEffect(() => {
     dispatch(fetchProduct());
   }, [dispatch]);
-  
-
 
   // Loading state
   if (status === "loading") {
@@ -39,14 +35,14 @@ const ProductsGridPage = () => {
   const getProductsArray = () => {
     if (!products) return [];
     
-    // If product is directly an array
-    // if (Array.isArray(product)) return product;
-    
-    // If product has data property that is array
-    // if (product.data && Array.isArray(product.data)) return product.data;
-    
-    // If product has products property that is array
+    // Handle products as array directly
     if (products && Array.isArray(products)) return products;
+    
+    // Handle products as object with data property
+    if (products?.data && Array.isArray(products.data)) return products.data;
+    
+    // Handle products as object with products property
+    if (products?.products && Array.isArray(products.products)) return products.products;
     
     return [];
   };
@@ -57,15 +53,27 @@ const ProductsGridPage = () => {
     return <div className="text-center py-20">No products found</div>;
   }
 
-  // Extract unique categories
+  // Extract unique categories - FIXED: Handle both string and object categories
   const categories = [...new Set(productsArray
-    .map(p => p.category)
+    .map(p => {
+      // If category is an object, get its name or _id
+      if (p.category && typeof p.category === 'object') {
+        return p.category.name || p.category._id;
+      }
+      // If category is a string, use it directly
+      return p.category;
+    })
     .filter(Boolean))];
 
-  // Filter products by categories
+  // Filter products by categories - FIXED: Compare correctly
   const filteredProducts = selectedCategories.length === 0
     ? productsArray
-    : productsArray.filter(product => selectedCategories.includes(product.category));
+    : productsArray.filter(product => {
+        const productCategory = product.category && typeof product.category === 'object' 
+          ? (product.category.name || product.category._id)
+          : product.category;
+        return selectedCategories.includes(productCategory);
+      });
 
   // Sort products
   const getSortedProducts = () => {
@@ -79,7 +87,7 @@ const ProductsGridPage = () => {
       case 'rating':
         return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       case 'latest':
-        return sorted.sort((a, b) => (b.id || b._id || 0) - (a.id || a._id || 0));
+        return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
       default:
         return sorted;
     }
@@ -113,6 +121,15 @@ const ProductsGridPage = () => {
   const getProductImage = (product) => {
     if (!product.image) return null;
     return typeof product.image === 'string' ? product.image : null;
+  };
+  
+  // Helper function to get category display name
+  const getCategoryName = (category) => {
+    if (!category) return 'Uncategorized';
+    if (typeof category === 'object') {
+      return category.name || 'Uncategorized';
+    }
+    return category;
   };
 
   return (
@@ -168,7 +185,7 @@ const ProductsGridPage = () => {
           <span className="text-gray-600 font-medium">Categories:</span>
           {categories.map((category) => (
             <button
-              key={category._id}
+              key={category}
               onClick={() => toggleCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 selectedCategories.includes(category)
@@ -234,7 +251,10 @@ const ProductsGridPage = () => {
 
               {/* Product Info */}
               <div className="p-3 md:p-4">
-                <p className="text-xs text-gray-500 mb-1">{product.category.name || 'Uncategorized'}</p>
+                {/* FIXED: Display category name properly */}
+                <p className="text-xs text-gray-500 mb-1">
+                  {getCategoryName(product.category)}
+                </p>
                 <h3 className="font-semibold text-gray-800 text-sm mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
                   {getProductName(product)}
                 </h3>

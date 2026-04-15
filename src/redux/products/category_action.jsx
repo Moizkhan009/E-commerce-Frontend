@@ -7,10 +7,11 @@ export const fetchCategories = createAsyncThunk(
   "category/fetchCategories",
   async (_, { rejectWithValue }) => {
     try {
+
       console.log("Fetching categories from:", `${API_URL}/categories`);
       const response = await fetch(`${API_URL}/categories`);
       
-      console.log("Response status:", response.status);
+      console.log("Response status:", response);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: Failed to fetch categories`);

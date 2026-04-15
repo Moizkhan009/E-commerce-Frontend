@@ -1,41 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ShoppingCart, Heart, Phone, Menu, X, User, Home, Package, Info, FileText, Mail, LogIn } from 'lucide-react';
-import { Link,useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Header = () => {
-  // const [activeMenu, setActiveMenu] = useState('home');
-  const Location =useLocation();
+  const location = useLocation(); // Fixed: lowercase 'location'
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check screen size on mount and resize
-  // useEffect(() => {
-  //   const checkScreenSize = () => {
-  //     setIsMobile(window.innerWidth < 1024);
-  //   };
-    
-  //   checkScreenSize();
-  //   window.addEventListener('resize', checkScreenSize);
-    
-  //   return () => window.removeEventListener('resize', checkScreenSize);
-  // }, []);
   useEffect(() => {
-  const checkScreenSize = () => {
-    setIsMobile(window.innerWidth < 1024);
-  };
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
 
-  checkScreenSize();
-  window.addEventListener('resize', checkScreenSize);
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
 
-  return () => {
-    window.removeEventListener('resize', checkScreenSize);
-  };
-}, []);
-
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
 
   const navigationItems = [
-    { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" />, path: '/home' },
+    { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" />, path: '/' }, // Changed from '/home' to '/'
     { id: 'deals', label: 'Hot Deals', icon: <span className="text-red-500">🔥</span>, path: '/deals' },
     { id: 'shop', label: 'Shop', icon: <Package className="w-5 h-5" />, path: '/shop' },
     { id: 'about', label: 'About', icon: <Info className="w-5 h-5" />, path: '/about' },
@@ -140,14 +127,6 @@ const Header = () => {
                   <span className="text-xs mt-1">Login</span>
                 </Link>
               </div>
-
-              {/* Mobile Cart Icon */}
-              {/* <Link to="/cart" className="lg:hidden relative">
-                <ShoppingCart className="w-6 h-6 text-gray-600 hover:text-emerald-600" />
-                <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                  0
-                </span>
-              </Link> */}
             </div>
           </div>
         </div>
@@ -169,11 +148,8 @@ const Header = () => {
                 <Link
                   key={item.id}
                   to={item.path}
-                  onClick={() => setActiveMenu(item.id)}
                   className={`flex items-center gap-2 py-4 font-medium transition-colors ${
-                    // activeMenu === item.id
-                    location.pathname==item.path
-
+                    location.pathname === item.path
                       ? 'text-emerald-600 border-b-2 border-emerald-600'
                       : 'text-gray-700 hover:text-emerald-600'
                   }`}
@@ -200,10 +176,8 @@ const Header = () => {
             <Link
               key={item.id}
               to={item.path}
-              onClick={() => setActiveMenu(item.id)}
               className={`flex-shrink-0 flex items-center gap-2 px-4 py-3 font-medium text-sm transition-colors whitespace-nowrap ${
-                // activeMenu === item.id
-                location.pathname==item.path
+                location.pathname === item.path
                   ? 'text-emerald-600 border-b-2 border-emerald-600'
                   : 'text-gray-700 hover:text-emerald-600'
               }`}
@@ -262,14 +236,9 @@ const Header = () => {
               <Link
                 key={item.id}
                 to={item.path}
-                onClick={() => {
-                  setActiveMenu(item.id);
-                  setIsDrawerOpen(false);
-                }}
+                onClick={() => setIsDrawerOpen(false)}
                 className={`flex items-center gap-3 w-full px-6 py-3 font-medium text-left transition-colors ${
-                  // activeMenu === item.id
                   location.pathname === item.path
-
                     ? 'text-emerald-600 bg-emerald-50'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
@@ -284,7 +253,7 @@ const Header = () => {
           <div className="border-t pt-4">
             {/* Wishlist */}
             <Link to="/wishlist" onClick={() => setIsDrawerOpen(false)}>
-              <button className="flex items-center gap-3 w-full px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3 w-full px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
                 <div className="relative">
                   <Heart className="w-6 h-6" />
                   <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
@@ -292,12 +261,12 @@ const Header = () => {
                   </span>
                 </div>
                 <span>Wishlist</span>
-              </button>
+              </div>
             </Link>
 
             {/* Cart */}
             <Link to="/cart" onClick={() => setIsDrawerOpen(false)}>
-              <button className="flex items-center gap-3 w-full px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3 w-full px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
                 <div className="relative">
                   <ShoppingCart className="w-6 h-6" />
                   <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
@@ -305,15 +274,15 @@ const Header = () => {
                   </span>
                 </div>
                 <span>Shopping Cart</span>
-              </button>
+              </div>
             </Link>
 
             {/* Login */}
             <Link to="/login" onClick={() => setIsDrawerOpen(false)}>
-              <button className="flex items-center gap-3 w-full px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3 w-full px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
                 <LogIn className="w-6 h-6" />
                 <span>Login / Register</span>
-              </button>
+              </div>
             </Link>
           </div>
 

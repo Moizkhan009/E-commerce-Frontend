@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useDispatch , useSelector } from 'react-redux';
+import { fetchCategories } from '../redux/products/category_action';
 
-const FeaturedCategories = () => {
+const Featuredcategoriess = () => {
   const [activeFilter, setActiveFilter] = useState('all');
 
-  // Categories data - easily replaceable with API data
-  const categories = [
+   const dispatch = useDispatch();
+    const { categories, status, error } = useSelector((state) => state.category);
+    console.log(categories);
+  
+    useEffect(() => {
+      dispatch(fetchCategories());
+    }, [dispatch]);
+
+  // categoriess data - easily replaceable with API data
+  const categoriess = [
     { id: 1, name: 'Dairy', items: 11, icon: '🍔', color: 'bg-green-50' },
     { id: 2, name: 'Meat', items: 6, icon: '🥝', color: 'bg-green-100' },
     { id: 3, name: 'Fruits', items: 6, icon: '🍑', color: 'bg-orange-50' },
@@ -51,8 +61,8 @@ const FeaturedCategories = () => {
     }
   ];
 
-  const scrollCategories = (direction) => {
-    const container = document.getElementById('categories-scroll');
+  const scrollcategories = (direction) => {
+    const container = document.getElementById('categoriess-scroll');
     const scrollAmount = 200;
     if (container) {
       container.scrollBy({
@@ -67,7 +77,7 @@ const FeaturedCategories = () => {
       {/* Header Section */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-6">
-          <h2 className="text-3xl font-bold text-gray-800">Featured Categories</h2>
+          <h2 className="text-3xl font-bold text-gray-800">Featured categoriess</h2>
           
           {/* Filter Buttons */}
           {/* <div className="flex gap-4">
@@ -90,13 +100,13 @@ const FeaturedCategories = () => {
         {/* Navigation Arrows */}
         <div className="flex gap-2">
           <button
-            onClick={() => scrollCategories('left')}
+            onClick={() => scrollcategories('left')}
             className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center hover:border-emerald-500 hover:text-emerald-500 transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
-            onClick={() => scrollCategories('right')}
+            onClick={() => scrollcategories('right')}
             className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center hover:border-emerald-500 hover:text-emerald-500 transition-colors"
           >
             <ChevronRight className="w-5 h-5" />
@@ -104,9 +114,9 @@ const FeaturedCategories = () => {
         </div>
       </div>
 
-      {/* Categories Grid */}
+      {/* categoriess Grid */}
       <div
-        id="categories-scroll"
+        id="categoriess-scroll"
         className="flex gap-4 overflow-x-auto scrollbar-hide mb-8 pb-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
@@ -115,16 +125,16 @@ const FeaturedCategories = () => {
             key={category.id}
             className="flex-shrink-0 w-32 cursor-pointer group"
           >
-            <div
+            {/* <div
               className={`${category.color} rounded-xl p-6 flex flex-col items-center justify-center h-32 transition-all group-hover:shadow-lg group-hover:-translate-y-1`}
             >
               <span className="text-5xl mb-2">{category.icon}</span>
-            </div>
+            </div> */}
             <div className="text-center mt-3">
               <h3 className="font-semibold text-gray-800 text-sm group-hover:text-emerald-600 transition-colors">
                 {category.name}
               </h3>
-              <p className="text-gray-500 text-xs mt-1">{category.items} Items</p>
+              {/* <p className="text-gray-500 text-xs mt-1">{category.items} Items</p> */}
             </div>
           </div>
         ))}
@@ -160,4 +170,4 @@ const FeaturedCategories = () => {
   );
 };
 
-export default FeaturedCategories;
+export default Featuredcategoriess;

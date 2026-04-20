@@ -11,9 +11,9 @@ import ContactPage from './pages/Contact'
 function App() {
   return (
     <Routes>
-      <Route path = "/" element ={<LoginPage/>}  />
+      <Route path = "/Login" element ={<LoginPage/>}  />
       <Route path = "/register" element ={<RegisterPage/>}  />
-      <Route path = "/home" element ={<Home/>}  />
+      <Route path = "/" element ={<Home/>}  />
       <Route path = "/shop" element ={<Shop/>}  />
       <Route path = "/admin" element ={<AdminPanel/>}  />
       <Route path="/About" element={<AboutPage/>} />

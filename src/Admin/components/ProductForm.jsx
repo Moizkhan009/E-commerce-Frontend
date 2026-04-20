@@ -16,7 +16,7 @@ const ProductForm = ({ setShowProductForm, editingProduct }) => {
     categories: state.category?.categories || [],
     categoriesLoading: state.category?.status === 'loading'
   }));
-  
+  console.log(categories)
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -43,21 +43,21 @@ const ProductForm = ({ setShowProductForm, editingProduct }) => {
   }, [categories]);
 
   // Populate form if editing
-  useEffect(() => {
-    if (editingProduct) {
-      setFormData({
-        name: editingProduct.name || '',
-        category: editingProduct.category || '',
-        brand: editingProduct.brand || '',
-        image: editingProduct.image || '',
-        price: editingProduct.price || '',
-        originalPrice: editingProduct.originalPrice || '',
-        rating: editingProduct.rating || '',
-        badge: editingProduct.badge || '',
-        badgeColor: editingProduct.badgeColor || ''
-      });
-    }
-  }, [editingProduct]);
+useEffect(() => {
+  if (editingProduct) {
+    setFormData({
+      name: editingProduct.name || '',
+      category: editingProduct.category?._id || editingProduct.category || '', // ✅ FIX
+      brand: editingProduct.brand || '',
+      image: editingProduct.image || '',
+      price: editingProduct.price || '',
+      originalPrice: editingProduct.originalPrice || '',
+      rating: editingProduct.rating || '',
+      badge: editingProduct.badge || '',
+      badgeColor: editingProduct.badgeColor || ''
+    });
+  }
+}, [editingProduct]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -168,7 +168,7 @@ const ProductForm = ({ setShowProductForm, editingProduct }) => {
                 {/* Dynamic categories from database */}
                 {categories.length > 0 ? (
                   categories.map((cat) => (
-                    <option key={cat._id || cat.id} value={cat.name}>
+                    <option key={cat._id || cat.id} value={cat._id}>
                       {cat.image ? `${cat.image} ` : ''}{cat.name}
                     </option>
                   ))

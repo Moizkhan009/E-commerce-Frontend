@@ -8,8 +8,8 @@ const Categories = ({ setShowCategoryForm, setSelectedCategory, setEditingCatego
   const dispatch = useDispatch();
   const [viewMode, setViewMode] = useState('categories'); // 'categories' ya 'products'
   const [currentCategory, setCurrentCategory] = useState(null);
-  const [showProductForm, setShowProductForm] = useState(false);
   
+  const [showProductForm, setShowProductForm] = useState(false) ;
   // Redux state - Tumhara actual state structure use karo
   // const { categories, categoryProducts, status, error } = useSelector((state) => ({
   //   categories: state.category?.categories || [],

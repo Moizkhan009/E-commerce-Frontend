@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Eye, Heart, Grid, List } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProduct } from "../../redux/products/products_action";
+import { addToCart } from '../../redux/Cart/Cartslice';
+import { toggleWishlist } from '../../redux/Wishlist/wishlistSlice';
 import { HashLoader } from "react-spinners";
+import { toast } from 'react-hot-toast';
+// import { Heart } from 'lucide-react';
 
 const ProductsGridPage = () => {
   const [sortBy, setSortBy] = useState('featured');
@@ -10,8 +14,59 @@ const ProductsGridPage = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const dispatch = useDispatch();
 
+const wishlistState = useSelector((state) => state.wishlist); // Access wishlist state from Redux
+const wishlistItems = wishlistState?.items || [];
+  const [loadingId, setLoadingId] = useState(null);
+
+
+  // const handleAddToCart = (product) => {
+  // dispatch(addToCart({productId: product._id,quantity: 1}));
+  //   toast.success("Added to cart 🛒");
+
+
+  // };
+  const isWishlist =(productId) => {
+    return wishlistItems.some(item => item.productId === productId);
+  }
+const handleWishlist = async (product) => {
+  setLoadingId(product._id);
+  try{
+    await dispatch(toggleWishlist(product._id ));
+    toast.success(isWishlist(product._id) ? "Removed from wishlist 💔" : "Added to wishlist ❤️");
+
+  }catch(error){
+    toast.error("Failed to update wishlist");
+  }finally{
+    setLoadingId(null);
+  }
+};
+
+
+  //  add tu cart handler with loading state and error handling
+const handleAddToCart = async (product) => {
+  try {
+    setLoadingId(product._id);
+
+    await dispatch(
+      addToCart({
+        productId: product._id,
+        quantity: 1,
+      })
+    );
+
+    toast.success("Added to cart 🛒");
+  } catch (error) {
+    toast.error("Failed to add");
+  } finally {
+    setLoadingId(null);
+  }
+
+};
+
+
   const { products, status, error } = useSelector((state) => state.product);
   console.log(products);
+  
 
   useEffect(() => {
     dispatch(fetchProduct());
@@ -118,10 +173,21 @@ const ProductsGridPage = () => {
   const getProductId = (product) => product._id || product.id;
   const getProductName = (product) => product.name || product.productName || 'Unnamed Product';
   const getProductPrice = (product) => product.price || product.priceValue || 0;
+
+// helper function to get product image url - FIXED: Handle both string and object images
+
   const getProductImage = (product) => {
-    if (!product.image) return null;
-    return typeof product.image === 'string' ? product.image : null;
-  };
+  if (!product.image) return null;
+  // Agar image direct string hai
+  if (typeof product.image === 'string') return product.image;
+  // Agar image ek object hai (common in Cloudinary/Multer)
+  if (typeof product.image === 'object') return product.image.url || product.image.secure_url;
+  return null;
+};
+  // const getProductImage = (product) => {
+  //   if (!product.image) return null;
+  //   return typeof product.image === 'string' ? product.image : null;
+  // };
   
   // Helper function to get category display name
   const getCategoryName = (category) => {
@@ -137,7 +203,11 @@ const ProductsGridPage = () => {
       {/* Top Bar */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="text-gray-600">
-          We found <span className="text-emerald-600 font-bold">{filteredProducts.length}</span> items for you!
+          We found{" "}
+          <span className="text-emerald-600 font-bold">
+            {filteredProducts.length}
+          </span>{" "}
+          items for you!
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
@@ -189,8 +259,8 @@ const ProductsGridPage = () => {
               onClick={() => toggleCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 selectedCategories.includes(category)
-                  ? 'bg-emerald-500 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? "bg-emerald-500 text-white shadow-md"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               {category}
@@ -209,26 +279,55 @@ const ProductsGridPage = () => {
 
       {/* Products Grid */}
       {displayedProducts.length === 0 ? (
-        <div className="text-center py-20 text-gray-500">No products match your filters</div>
+        <div className="text-center py-20 text-gray-500">
+          No products match your filters
+        </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
           {displayedProducts.map((product) => (
+            console.log(product),
+            
             <div
               key={getProductId(product) || Math.random()}
               className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group relative"
             >
               {/* Product Badge */}
               {product.badge && (
-                <div className={`absolute top-3 left-3 ${product.badgeColor || 'bg-emerald-500'} text-white text-xs px-3 py-1 rounded-full font-semibold z-10`}>
+                <div
+                  className={`absolute top-3 left-3 ${product.badgeColor || "bg-emerald-500"} text-white text-xs px-3 py-1 rounded-full font-semibold z-10`}
+                >
                   {product.badge}
                 </div>
               )}
 
               {/* Hover Actions */}
               <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                <button className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors">
+               <button
+  onClick={() => handleWishlist(product)}
+  disabled={loadingId === product._id}
+  className={`w-8 h-8 rounded-full shadow-md flex items-center justify-center transition-all duration-300
+    ${
+      isWishlist(product._id)
+        ? "bg-red-500 text-white scale-110"
+        : "bg-white text-gray-600 hover:bg-red-500 hover:text-white"
+    }
+  `}
+>
+  {loadingId === product._id ? (
+    <div className="w-3 h-3 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+  ) : (
+    <Heart
+      className={`w-4 h-4 ${
+        isWishlist(product._id) ? "fill-white" : ""
+      }`}
+    />
+  )}
+</button>
+
+                {/* <button 
+                className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors">
                   <Heart className="w-4 h-4" />
-                </button>
+                </button> */}
                 <button className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors">
                   <Eye className="w-4 h-4" />
                 </button>
@@ -237,10 +336,17 @@ const ProductsGridPage = () => {
               {/* Product Image */}
               <div className="bg-gray-50 p-6 md:p-8 flex items-center justify-center h-40 md:h-48">
                 {getProductImage(product) ? (
-                  <img 
-                    src={getProductImage(product)} 
+                  <img
+                    src={getProductImage(product)}
                     alt={getProductName(product)}
+                   
+                    
                     className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300"
+                  //  image error handling - FIXED: Show placeholder on error
+                    onError={(e)=>{
+                    e.target.onerror = null;
+                    e.target.src = "https://t3.ftcdn.net/jpg/05/04/28/96/360_F_504289605_zehJiK0tCuZLP2MdfFBpcJdOVxKLnXg1.jpg";
+                  }}
                   />
                 ) : (
                   <span className="text-6xl md:text-7xl group-hover:scale-110 transition-transform duration-300">
@@ -258,11 +364,13 @@ const ProductsGridPage = () => {
                 <h3 className="font-semibold text-gray-800 text-sm mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
                   {getProductName(product)}
                 </h3>
-                
+
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-2">
                   {renderStars(product.rating)}
-                  <span className="text-xs text-gray-500">({product.rating || 0})</span>
+                  <span className="text-xs text-gray-500">
+                    ({product.rating || 0})
+                  </span>
                 </div>
 
                 {/* Brand */}
@@ -284,8 +392,29 @@ const ProductsGridPage = () => {
                       </span>
                     )}
                   </div>
-                  <button className="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-500 hover:text-white transition-colors">
+                  {/* <button
+                  onClick={()=>{
+                 console.log("Add tu cart clicked");
+                 handleAddToCart(product);
+                 
+
+
+                  }}
+                  
+                  
+                  className="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-500 hover:text-white transition-colors">
                     <ShoppingCart className="w-4 h-4" />
+                  </button> */}
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    disabled={loadingId === product._id}
+                    className="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center"
+                  >
+                    {loadingId === product._id ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <ShoppingCart className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -298,7 +427,7 @@ const ProductsGridPage = () => {
       {displayedProducts.length < filteredProducts.length && (
         <div className="text-center mt-8">
           <button
-            onClick={() => setShowCount(prev => prev + 20)}
+            onClick={() => setShowCount((prev) => prev + 20)}
             className="bg-emerald-500 text-white px-8 py-3 rounded-lg hover:bg-emerald-600 transition-colors font-semibold"
           >
             Load More Products

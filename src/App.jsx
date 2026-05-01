@@ -8,6 +8,8 @@ import AdminPanel from './Admin/AdminPanel'
 import AboutPage from './pages/About'
 import BlogPage from './pages/Blog'
 import ContactPage from './pages/Contact'
+import CartPage from './pages/CartPage'
+import WishlistPage from './pages/WishlistPage'
 function App() {
   return (
     <Routes>
@@ -19,7 +21,10 @@ function App() {
       <Route path="/About" element={<AboutPage/>} />
       <Route path='/Blog' element={<BlogPage/>}/>
       <Route path='/contact' element={<ContactPage/>} />
-      </Routes>
+      <Route path='/cart' element={<CartPage/>} />
+      <Route path='/wishlist' element={<WishlistPage/>} />
+      {/* <Route path='/wishlist' element={<WishlistTestPage/>} /> */}
+    </Routes>
  
   )
 }

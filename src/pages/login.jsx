@@ -14,7 +14,7 @@ export default function LoginPage() {
     try {
       const response = await axios.post('http://localhost:5000/api/users/login', {
         email,
-        password
+        password  
       });
 
       console.log('Login success:', response.data);
@@ -23,7 +23,7 @@ export default function LoginPage() {
       localStorage.setItem('token', response.data.token);
 
       // Redirect after login
-      navigate('/Home'); // Change /dashboard as per your app
+      navigate('/'); // Change /dashboard as per your app
 
     } catch (error) {
       console.error(error.response?.data);

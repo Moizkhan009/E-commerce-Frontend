@@ -31,7 +31,7 @@ export const fetchProduct = createAsyncThunk(
     console.log("run");
     
     try {
-      const response = await fetch("http://localhost:5000/api/getProduct");
+      const response = await fetch("http://localhost:5000/api/Product/get");
       console.log("response from action", response);
        
       if (!response.ok) {

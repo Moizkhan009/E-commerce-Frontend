@@ -5,7 +5,8 @@ import { fetchProduct } from "../../redux/products/products_action";
 import { addToCart } from '../../redux/Cart/Cartslice';
 import { toggleWishlist } from '../../redux/Wishlist/wishlistSlice';
 import { HashLoader } from "react-spinners";
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom';
 // import { Heart } from 'lucide-react';
 
 const ProductsGridPage = () => {
@@ -13,10 +14,21 @@ const ProductsGridPage = () => {
   const [showCount, setShowCount] = useState(50);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
 const wishlistState = useSelector((state) => state.wishlist); // Access wishlist state from Redux
 const wishlistItems = wishlistState?.items || [];
   const [loadingId, setLoadingId] = useState(null);
+
+
+  const token = localStorage.getItem("token");
+
+if (token) {
+  console.log("User logged in");
+} else {
+  console.log("User not logged in");
+}
+
 
 
   // const handleAddToCart = (product) => {
@@ -25,10 +37,19 @@ const wishlistItems = wishlistState?.items || [];
 
 
   // };
+
+  // const isLoggedIn = auth?.users && auth?.token;
   const isWishlist =(productId) => {
     return wishlistItems.some(item => item.productId === productId);
   }
 const handleWishlist = async (product) => {
+//  if (!auth?.token) {
+//       toast.error("Please login to manage wishlist");
+//       navigate("/login", { state: { from: location.pathname } });
+    //   return;
+    // }
+
+
   setLoadingId(product._id);
   try{
     await dispatch(toggleWishlist(product._id ));
@@ -44,6 +65,12 @@ const handleWishlist = async (product) => {
 
   //  add tu cart handler with loading state and error handling
 const handleAddToCart = async (product) => {
+//  if (!auth?.token) {
+//       toast.error("Please login to add to cart");
+//       navigate("/login", { state: { from: location.pathname } });
+//       return;
+//     }
+
   try {
     setLoadingId(product._id);
 
@@ -65,7 +92,7 @@ const handleAddToCart = async (product) => {
 
 
   const { products, status, error } = useSelector((state) => state.product);
-  console.log(products);
+  // console.log(products);
   
 
   useEffect(() => {
@@ -179,6 +206,7 @@ const handleAddToCart = async (product) => {
   const getProductImage = (product) => {
   if (!product.image) return null;
   // Agar image direct string hai
+
   if (typeof product.image === 'string') return product.image;
   // Agar image ek object hai (common in Cloudinary/Multer)
   if (typeof product.image === 'object') return product.image.url || product.image.secure_url;
@@ -285,7 +313,7 @@ const handleAddToCart = async (product) => {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
           {displayedProducts.map((product) => (
-            console.log(product),
+            // console.log(product),
             
             <div
               key={getProductId(product) || Math.random()}
@@ -328,7 +356,10 @@ const handleAddToCart = async (product) => {
                 className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors">
                   <Heart className="w-4 h-4" />
                 </button> */}
-                <button className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors">
+                <button
+                onClick={()=>navigate(`/product/${product._id}`)}
+                
+                className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors">
                   <Eye className="w-4 h-4" />
                 </button>
               </div>

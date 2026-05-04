@@ -21,12 +21,15 @@ const WishlistCard = ({ item }) => {
   const [hov, setHov]             = useState(false);
   const [heartHov, setHeartHov]   = useState(false);
 
-  // Tera exact same field resolution from Textwishlist
+  //  exact same field resolution from Textwishlist
   const prod  = item.product || {};
   const pid   = prod._id || item.product;
+  // const name  = item.name  || prod.name  || "No Name";
+  // const image = item.image || prod.image;
+  // const price = item.price || prod.price || 0;
   const name  = item.name  || prod.name  || "No Name";
-  const image = item.image || prod.image;
-  const price = item.price || prod.price || 0;
+const image = item.image || prod.image;
+const price = item.price || prod.price || 0;
 
   // Heart button → toggleWishlist(pid) then fetchWishlist()
   // Tera exact same handleRemove logic

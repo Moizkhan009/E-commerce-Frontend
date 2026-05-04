@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ShoppingCart, Heart, Phone, Menu, X, User, Home, Package, Info, FileText, Mail, LogIn } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-
+import {useSelector } from 'react-redux'; 
 const Header = () => {
   const location = useLocation(); // Fixed: lowercase 'location'
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
+
+
+  const wishlisState = useSelector((state) => state.wishlist );   /// Access wishlist items from Redux store
+const cartState = useSelector((state)=> state.cart);  /// Access cart items from Redux store
+  
+
+const wishlistCount = wishlisState?.items?.length || 
+ wishlisState?.data?.length || 0;  /// Calculate wishlist count
+const cartCount = cartState?.cartItems?.length ||
+cartState?.data?.length || 0;  /// Calculate cart count 
+
+useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 1024);
     };
@@ -104,7 +115,7 @@ const Header = () => {
                   <div className="relative">
                     <Heart className="w-6 h-6" />
                     <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                      0
+                      {wishlistCount}
                     </span>
                   </div>
                   <span className="text-xs mt-1">Wishlist</span>
@@ -115,7 +126,7 @@ const Header = () => {
                   <div className="relative">
                     <ShoppingCart className="w-6 h-6" />
                     <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                      0
+                      {cartCount}
                     </span>
                   </div>
                   <span className="text-xs mt-1">Cart</span>

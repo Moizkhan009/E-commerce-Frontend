@@ -33,8 +33,8 @@ const ProductActions = ({ product, isWishlisted = false }) => {
     setTimeout(() => setWishAnim(false), 600);
   };
 
-  const maxQty = product.countInStock || 99;
-  const inStock = product.countInStock > 10;
+  const maxQty = product.countInStock || 10;
+  const inStock = product.countInStock > 0;
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16, fontFamily:FONT, ...fadeUp(300) }}>
@@ -72,7 +72,7 @@ const ProductActions = ({ product, isWishlisted = false }) => {
       {/* Add to Cart */}
       <button
         onClick={handleAddToCart}
-        enable={inStock}
+        disabled={!inStock}
         style={{
           ...s.cartBtn,
           background: cartAdded ? T.greenDark : inStock ? T.green : "#D1D9E0",

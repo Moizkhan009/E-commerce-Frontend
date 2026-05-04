@@ -105,7 +105,7 @@ const WelcomeSection = () => {
         {/* CTA */}
         <div style={{ display:"flex", alignItems:"center", gap:28 }}>
           <button 
-          onClick={()=> navigate("/Home")}
+          onClick={()=> navigate("/")}
           className="ws-btn-primary"
            style={
             { background:"#3BB77E",

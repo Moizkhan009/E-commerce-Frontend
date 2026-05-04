@@ -1,14 +1,8 @@
 import React from "react";
-// import HeroSection from "../components/HeroSection";
 import ContactHeroSection from "../components/ContactComponents/ContactHero";
-// import MapSection from "../components/MapSection";
 import MapSection from "../components/ContactComponents/Mapsection";
-// import ContactForm from "../components/ContactForm";
 import ContactForm from "../components/ContactComponents/Contactform";
-// import Newsletter from "../components/Newsletter";
 import ContactNewsletter from "../components/ContactComponents/contactNewsletter";
-// import Footer from "../components/Footer";
-// import ContactFooter from "../components/footer";
 import Footer from "../components/footer";
 import Header from "../components/header";
 export default function ContactPage() {

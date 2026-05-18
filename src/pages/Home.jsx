@@ -1,5 +1,5 @@
 import React from 'react'
-import Header from '../components/header'
+// import Header from '../components/header'
 import HeroSection from '../components/heroSection'
 import FeaturedCategories from '../components/featuredCategories'
 import PopularProducts from '../components/popularProducts'
@@ -13,7 +13,7 @@ import FeaturesSection from '../components/featureSection'
 function Home() {
   return (
     <div>
-   <Header/>
+   {/* <Header/> */}
    <HeroSection/>
    <FeaturedCategories/>
    <PopularProducts/>

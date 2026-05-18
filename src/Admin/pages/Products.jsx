@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Package, Trash2, Edit, Star, Search } from "lucide-react";
 import { addProduct, fetchProduct, deleteProduct } from "../../redux/products/products_action";
 
-const Products = ({ setShowProductForm, setEditingProduct }) => {
+const Products = ({ ShowProductForm, setEditingProduct }) => {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -20,8 +20,8 @@ const Products = ({ setShowProductForm, setEditingProduct }) => {
     if (setEditingProduct && typeof setEditingProduct === "function") {
       setEditingProduct(null);
     }
-    if (setShowProductForm && typeof setShowProductForm === "function") {
-      setShowProductForm(true);
+    if (ShowProductForm && typeof ShowProductForm === "function") {
+      ShowProductForm(true);
     }
   };
 
@@ -42,7 +42,7 @@ const Products = ({ setShowProductForm, setEditingProduct }) => {
     if (setEditingProduct && typeof setEditingProduct === "function") {
       setEditingProduct(product);
     }
-    if (setShowProductForm && typeof setShowProductForm === "function") {
+    if (ShowProductForm && typeof ShowProductForm === "function") {
       setShowProductForm(true);
     }
   };
@@ -223,3 +223,5 @@ const Products = ({ setShowProductForm, setEditingProduct }) => {
 };
 
 export default Products;
+
+

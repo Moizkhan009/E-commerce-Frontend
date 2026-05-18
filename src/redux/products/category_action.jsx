@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const API_URL = "http://localhost:5000/api/category";
 
-// ============ FETCH CATEGORIES ============
+//  FETCH CATEGORIES 
 export const fetchCategories = createAsyncThunk(
   "category/fetchCategories",
   async (_, { rejectWithValue }) => {
@@ -20,7 +20,7 @@ export const fetchCategories = createAsyncThunk(
       const data = await response.json();
       console.log("Fetched data:", data);
       
-      // ✅ Handle different response structures
+      //  Handle different response structures
       if (data.categories && Array.isArray(data.categories)) {
         return data.categories;
       } else if (Array.isArray(data)) {
@@ -35,7 +35,7 @@ export const fetchCategories = createAsyncThunk(
   }
 );
 
-// ============ ADD CATEGORY ============
+//  ADD CATEGORY 
 export const addCategory = createAsyncThunk(
   "category/addCategory",
   async (categoryData, { rejectWithValue }) => {
@@ -61,12 +61,13 @@ export const addCategory = createAsyncThunk(
   }
 );
 
-// ============ UPDATE CATEGORY ============
+//  UPDATE CATEGORY 
 export const updateCategory = createAsyncThunk(
   "category/updateCategory",
-  async ({ id, data }, { rejectWithValue }) => {
+  async ({ categoryId, data }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_URL}/categories/${id}`, {
+      // const response = await fetch(`${API_URL}/${categoryId}`, {
+      const response = await fetch(`${API_URL}/${categoryId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -87,7 +88,7 @@ export const updateCategory = createAsyncThunk(
   }
 );
 
-// ============ DELETE CATEGORY ============
+//  DELETE CATEGORY 
 export const deleteCategory = createAsyncThunk(
   "category/deleteCategory",
   async (categoryId, { rejectWithValue }) => {
@@ -108,7 +109,7 @@ export const deleteCategory = createAsyncThunk(
   }
 );
 
-// ============ GET PRODUCTS BY CATEGORY ============
+//  GET PRODUCTS BY CATEGORY
 export const getProductsByCategory = createAsyncThunk(
   "category/getProductsByCategory",
   async (categoryId, { rejectWithValue }) => {

@@ -4,7 +4,7 @@ import MapSection from "../components/ContactComponents/Mapsection";
 import ContactForm from "../components/ContactComponents/Contactform";
 import ContactNewsletter from "../components/ContactComponents/contactNewsletter";
 import Footer from "../components/footer";
-import Header from "../components/header";
+// import Header from "../components/header";
 export default function ContactPage() {
   return (
     <div style={{ fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif" }}>
@@ -26,7 +26,7 @@ export default function ContactPage() {
       </div>
 
       {/* Page Sections */}
-      <Header/>
+      {/* <Header/> */}
       <ContactHeroSection />
       <MapSection />
       <ContactForm />

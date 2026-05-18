@@ -14,7 +14,7 @@ import CartItemCard from "../components/CartComponents/Cartitemcard.jsx";
 import CartSummary  from "../components/CartComponents/CartSummary.jsx";
 import CartEmpty    from "../components/CartComponents/CartEmpty.jsx";
 import CartSkeleton from "../components/CartComponents/Cartskelton.jsx";
-import Header from "../components/header.jsx";
+// import Header from "../components/header.jsx";
 
 const CartPage = () => {
   const dispatch = useDispatch();
@@ -70,7 +70,7 @@ const CartPage = () => {
           ))}
         </div>
       </div> */}
-         <Header></Header>
+         {/* <Header/> */}
       {/* Main */}
       <div style={s.main}>
 

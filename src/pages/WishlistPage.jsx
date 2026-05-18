@@ -8,7 +8,7 @@ import {
   fetchWishlist,
   clearWishlistMessage,
 } from "../redux/Wishlist/wishlistSlice.js";
-import Header from "../components/header.jsx";
+// import Header from "../components/header.jsx";
 import WishlistCard     from "../components/WishlistComponents/WishlistCard.jsx";
 import WishlistEmpty    from "../components/WishlistComponents/WishlistEmpty.jsx";
 import WishlistSkeleton from "../components/WishlistComponents/WishlistSkeleton.jsx";
@@ -104,7 +104,7 @@ const WishlistPage = () => {
           ))}
         </div>
       </div> */}
-<Header></Header>
+{/* <Header/> */}
       {/* Main */}
       <div style={s.main}>
 

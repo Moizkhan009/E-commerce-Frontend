@@ -3,35 +3,103 @@ import { Eye, EyeOff, Mail, Lock, ShoppingBag } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-export default function LoginPage() {
+export default function LoginPage({ setIsAuth, setUserInfo }) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate(); // Redirect after login
 
-  const handleSubmit = async () => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/users/login', {
+//   const handleSubmit = async () => {
+//     try {
+//       const response = await axios.post('http://localhost:5000/api/users/login', {
+//         email,
+//         password  
+//       });
+
+//       console.log('Login success:', response.data);
+
+//       // Token save karo localStorage me (optional)
+//       // localStorage.setItem('token', response.data.token);
+//       localStorage.setItem(
+// "userInfo",
+// JSON.stringify(response.data)
+// );
+//       setIsAuth(true); // Update authentication state in parent component
+
+//       // Redirect after login
+//       navigate('/'); // Change /dashboard as per your app
+
+//     } catch (error) {
+//       console.error(error.response?.data);
+//       alert(error.response?.data?.message || 'Login failed');
+//     }
+
+
+//       // Role-based redirect
+//   //   if (response.data.user.role === "admin") {
+//   //     navigate("/admin/dashboard");
+//   //   } else {
+//   //     navigate("/");
+//   //   }
+
+//   // } catch (error) {
+//   //   console.error(error.response?.data);
+
+//   //   alert(
+//   //     error.response?.data?.message ||
+//   //     "Login failed"
+//   //   );
+//   };
+
+const handleSubmit = async () => {
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/api/users/login",
+      {
         email,
-        password  
-      });
+        password,
+      }
+    );
 
-      console.log('Login success:', response.data);
+    console.log("Login success:", response.data);
 
-      // Token save karo localStorage me (optional)
-      localStorage.setItem('token', response.data.token);
+    // Save full user info
+    // localStorage.setItem(
+    //   "userInfo",
+    //   JSON.stringify(response.data)
+    // );
+localStorage.setItem(
+  "userInfo",
+  JSON.stringify({
+    token: response.data.token,
+    user: response.data.user,
+  })
+);
+setUserInfo({
+  token: response.data.token,
+  user: response.data.user,
+});
 
-      // Redirect after login
-      navigate('/'); // Change /dashboard as per your app
+    // setIsAuth(true);
+    if (typeof setIsAuth === "function") {
+  setIsAuth(true);
+}
 
-    } catch (error) {
-      console.error(error.response?.data);
-      alert(error.response?.data?.message || 'Login failed');
+    // Role-based redirect
+    if (response.data.user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
     }
-  };
-
-
+  } catch (error) {
+    console.error(error.response?.data);
+    alert(
+      error.response?.data?.message ||
+      "Login failed"
+    );
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4 ">
       <div className="w-full max-w-md">
@@ -45,9 +113,18 @@ export default function LoginPage() {
           </div>
 
           <h2 className="text-3xl font-bold text-gray-800 mb-2">Login</h2>
-          <p className="text-gray-600 mb-8">
+          {/* <p className="text-gray-600 mb-8">
             Don't have an account? <a href="#" className="text-green-600 font-semibold hover:text-green-700"><Link to = "/register" > SignUp </Link></a>
-          </p>
+          </p> */}
+          <p className="text-gray-600 mb-8">
+  Don't have an account?{" "}
+  <Link
+    to="/register"
+    className="text-green-600 font-semibold hover:text-green-700"
+  >
+    SignUp
+  </Link>
+</p>
 
           <div className="space-y-6">
             {/* Email Input */}
@@ -155,4 +232,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+};

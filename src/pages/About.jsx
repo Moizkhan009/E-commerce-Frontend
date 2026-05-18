@@ -6,12 +6,15 @@ import InfoCards from "../components/AboutComponents/Infocards";
 import StatsSection from "../components/AboutComponents/Statssection";
 import TeamSection from "../components/AboutComponents/Teamsection";
 import NewsletterSection from "../components/AboutComponents/Newslettersection";
-import Header from "../components/header";
+// import Header from "../components/header";
+import { Home } from "lucide-react";
 const Aboutpage = () =>{
 return(
     <div>
 
-  <Header/>
+  {/* <Header/>
+   */}
+   <Home/>
  <WelcomeSection />
      <WhatWeProvide />
        <PartnerSection />

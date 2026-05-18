@@ -24,7 +24,44 @@
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-// ============ FETCH PRODUCTS ============
+
+
+
+
+// export const fetchProductsBySection = createAsyncThunk(
+//   'products/fetchBySection',
+//   async (section, { rejectWithValue }) => {
+//     try {
+//       const res = await fetch(`http://localhost:5000/api/product/section/${section}`);
+//       const data = await res.json();
+//       return { section, products: data.data };
+//     } catch (error) {
+//       return rejectWithValue(error.message);
+//     }
+//   }
+// );
+// products_action.jsx
+export const fetchProductsBySection = createAsyncThunk(
+  'products/fetchBySection',
+  async (section, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/product/section/${section}`);
+      const data = await res.json();
+     
+      return { 
+        section, 
+        products: data.products || [],  // data.products hai array
+        success: data.success,
+        count: data.count
+      };
+    } catch (error) {
+      console.error('Error fetching section:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+//  FETCH PRODUCTS 
 export const fetchProduct = createAsyncThunk(
   "product/fetchProduct",
   async () => {
@@ -49,12 +86,12 @@ export const fetchProduct = createAsyncThunk(
   }
 );
 
-// ============ ADD PRODUCT ============
+//  ADD PRODUCT 
 export const addProduct = createAsyncThunk(
   "product/addProduct",
   async (productData) => {
     try {
-      const response = await fetch("http://localhost:5000/api/products", {
+      const response = await fetch("http://localhost:5000/api/product", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,12 +117,12 @@ export const addProduct = createAsyncThunk(
   }
 );
 
-// ============ DELETE PRODUCT (Optional - add backend route if needed) ============
+//  DELETE PRODUCT 
 export const deleteProduct = createAsyncThunk(
   "product/deleteProduct",
   async (productId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/deleteProduct/${productId}`, {
+      const response = await fetch(`http://localhost:5000/api/delete/${productId}`, {
         method: "DELETE",
       });
 
@@ -102,6 +139,46 @@ export const deleteProduct = createAsyncThunk(
       return productId; // Return ID to remove from state
     } catch (error) {
       console.log("Delete Product Error:", error.message);
+      throw error;
+    }
+  }
+);
+// UPDATE PRODUCT 
+export const updateProduct = createAsyncThunk(
+  "product/updateProduct",
+  async ({ productId, productData }) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/product/update/${productId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(productData),
+        }
+      );
+
+      console.log("Update Product Response:", response);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+
+        console.log("API Error:", errorData.message);
+
+        throw new Error(
+          errorData.message || "Failed to update product"
+        );
+      }
+
+      const data = await response.json();
+
+      console.log("Product Updated Successfully:", data);
+
+      return data.product;
+    } catch (error) {
+      console.log("Update Product Error:", error.message);
+
       throw error;
     }
   }

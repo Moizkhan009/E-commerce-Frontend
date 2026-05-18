@@ -120,11 +120,11 @@ const Featuredcategoriess = () => {
         className="flex gap-4 overflow-x-auto scrollbar-hide mb-8 pb-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {categories.map((category) => (
-          <div
+        {categories.map((category) => (<div
             key={category.id}
             className="flex-shrink-0 w-32 cursor-pointer group"
           >
+            
             {/* <div
               className={`${category.color} rounded-xl p-6 flex flex-col items-center justify-center h-32 transition-all group-hover:shadow-lg group-hover:-translate-y-1`}
             >

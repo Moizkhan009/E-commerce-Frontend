@@ -7,7 +7,7 @@ import ProductImageBox  from "../components/ProductDetailComponents/Productimage
 import ProductMeta      from "../components/ProductDetailComponents/Productmeta.jsx";
 import ProductActions   from "../components/ProductDetailComponents/Productactions.jsx";
 import ProductSkeleton  from "../components/ProductDetailComponents/Productskeleton.jsx";
-import Header from "../components/header.jsx";
+// import Header from "../components/header.jsx";
 
 // ─────────────────────────────────────────────────────────────
 //  ProductDetailPage
@@ -105,7 +105,7 @@ const ProductDetailPage = () => {
           ))}
         </div>
       </div> */}
-      <Header/>
+      {/* <Header/> */}
 
       <div style={s.main}>
 

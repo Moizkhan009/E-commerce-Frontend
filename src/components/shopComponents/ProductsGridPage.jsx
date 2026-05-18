@@ -5,184 +5,148 @@ import { fetchProduct } from "../../redux/products/products_action";
 import { addToCart } from '../../redux/Cart/Cartslice';
 import { toggleWishlist } from '../../redux/Wishlist/wishlistSlice';
 import { HashLoader } from "react-spinners";
-import { toast } from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom';
-// import { Heart } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { useNavigate, useLocation } from 'react-router-dom';
+import ProductSkeleton from './ProductSkeleton';
 
 const ProductsGridPage = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [showCount, setShowCount] = useState(50);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-const wishlistState = useSelector((state) => state.wishlist); // Access wishlist state from Redux
-const wishlistItems = wishlistState?.items || [];
   const [loadingId, setLoadingId] = useState(null);
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation(); // ✅ Current page ka path — login ke baad wapis aane ke liye
 
-  const token = localStorage.getItem("token");
+  const wishlistState = useSelector((state) => state.wishlist);
+  const wishlistItems = wishlistState?.items || [];
 
-if (token) {
-  console.log("User logged in");
-} else {
-  console.log("User not logged in");
-}
+  // ✅ Token se login check
+  const token = localStorage.getItem("userInfo");
+  const isLoggedIn = !!token;
 
+  // ✅ Wishlist mein product hai ya nahi
+  const isInWishlist = (productId) => {
+    return wishlistItems.some(item => item.productId === productId || item._id === productId);
+  };
 
+  // ✅ Wishlist handler — login nahi toh login page par bhejo, wapis same page par
+  const handleWishlist = async (product) => {
+    if (!isLoggedIn) {
+      toast.error("Login required to add items to your wishlist❤️");
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
 
-  // const handleAddToCart = (product) => {
-  // dispatch(addToCart({productId: product._id,quantity: 1}));
-  //   toast.success("Added to cart 🛒");
-
-
-  // };
-
-  // const isLoggedIn = auth?.users && auth?.token;
-  const isWishlist =(productId) => {
-    return wishlistItems.some(item => item.productId === productId);
-  }
-const handleWishlist = async (product) => {
-//  if (!auth?.token) {
-//       toast.error("Please login to manage wishlist");
-//       navigate("/login", { state: { from: location.pathname } });
-    //   return;
-    // }
-
-
-  setLoadingId(product._id);
-  try{
-    await dispatch(toggleWishlist(product._id ));
-    toast.success(isWishlist(product._id) ? "Removed from wishlist 💔" : "Added to wishlist ❤️");
-
-  }catch(error){
-    toast.error("Failed to update wishlist");
-  }finally{
-    setLoadingId(null);
-  }
-};
-
-
-  //  add tu cart handler with loading state and error handling
-const handleAddToCart = async (product) => {
-//  if (!auth?.token) {
-//       toast.error("Please login to add to cart");
-//       navigate("/login", { state: { from: location.pathname } });
-//       return;
-//     }
-
-  try {
     setLoadingId(product._id);
+    try {
+      await dispatch(toggleWishlist(product._id));
+      toast.success(
+        isInWishlist(product._id)
+          ? "Removed From Wishlist💔"
+          : "Added to Wishlist❤️"
+      );
+    } catch (error) {
+      toast.error("Failed to update wishlist");
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
-    await dispatch(
-      addToCart({
-        productId: product._id,
-        quantity: 1,
-      })
-    );
+  // ✅ Cart handler — login nahi toh login page par bhejo, wapis same page par
+  const handleAddToCart = async (product) => {
+    if (!isLoggedIn) {
+      toast.error("Please login to add items to cart 🛒");
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
 
-    toast.success("Added to cart 🛒");
-  } catch (error) {
-    toast.error("Failed to add");
-  } finally {
-    setLoadingId(null);
-  }
-
-};
-
+    try {
+      setLoadingId(product._id);
+      await dispatch(
+        addToCart({
+          productId: product._id,
+          quantity: 1,
+        })
+      );
+      toast.success("Added to Cart🛒");
+    } catch (error) {
+      toast.error("Failed to add to Cart");
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   const { products, status, error } = useSelector((state) => state.product);
-  // console.log(products);
-  
 
   useEffect(() => {
     dispatch(fetchProduct());
   }, [dispatch]);
 
-  // Loading state
   if (status === "loading") {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <HashLoader color="#059669" />
+      <div className="w-full max-w-7xl mx-auto px-4 py-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+        {[...Array(10)].map((_, i) => (
+          <ProductSkeleton key={i} />
+        ))}
       </div>
+    </div>
     );
   }
-  
-  // Error state
+
   if (status === "failed") {
     return <div className="text-center py-20 text-red-500">Error: {error}</div>;
   }
-  
-  // Get products array from response
+
   const getProductsArray = () => {
     if (!products) return [];
-    
-    // Handle products as array directly
-    if (products && Array.isArray(products)) return products;
-    
-    // Handle products as object with data property
+    if (Array.isArray(products)) return products;
     if (products?.data && Array.isArray(products.data)) return products.data;
-    
-    // Handle products as object with products property
     if (products?.products && Array.isArray(products.products)) return products.products;
-    
     return [];
   };
-  
+
   const productsArray = getProductsArray();
-  
+
   if (productsArray.length === 0) {
-    return <div className="text-center py-20">No products found</div>;
+    return <div className="text-center py-20">Koi product nahi mila</div>;
   }
 
-  // Extract unique categories - FIXED: Handle both string and object categories
   const categories = [...new Set(productsArray
     .map(p => {
-      // If category is an object, get its name or _id
-      if (p.category && typeof p.category === 'object') {
-        return p.category.name || p.category._id;
-      }
-      // If category is a string, use it directly
+      if (p.category && typeof p.category === 'object') return p.category.name || p.category._id;
       return p.category;
     })
     .filter(Boolean))];
 
-  // Filter products by categories - FIXED: Compare correctly
   const filteredProducts = selectedCategories.length === 0
     ? productsArray
     : productsArray.filter(product => {
-        const productCategory = product.category && typeof product.category === 'object' 
+        const productCategory = product.category && typeof product.category === 'object'
           ? (product.category.name || product.category._id)
           : product.category;
         return selectedCategories.includes(productCategory);
       });
 
-  // Sort products
   const getSortedProducts = () => {
     const sorted = [...filteredProducts];
-    
     switch (sortBy) {
-      case 'price-low':
-        return sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
-      case 'price-high':
-        return sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
-      case 'rating':
-        return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-      case 'latest':
-        return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-      default:
-        return sorted;
+      case 'price-low': return sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
+      case 'price-high': return sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
+      case 'rating': return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      case 'latest': return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      default: return sorted;
     }
   };
-  
+
   const sortedProducts = getSortedProducts();
   const displayedProducts = sortedProducts.slice(0, showCount);
 
   const toggleCategory = (category) => {
     setSelectedCategories(prev =>
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
+      prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
     );
   };
 
@@ -201,28 +165,16 @@ const handleAddToCart = async (product) => {
   const getProductName = (product) => product.name || product.productName || 'Unnamed Product';
   const getProductPrice = (product) => product.price || product.priceValue || 0;
 
-// helper function to get product image url - FIXED: Handle both string and object images
-
   const getProductImage = (product) => {
-  if (!product.image) return null;
-  // Agar image direct string hai
+    if (!product.image) return null;
+    if (typeof product.image === 'string') return product.image;
+    if (typeof product.image === 'object') return product.image.url || product.image.secure_url;
+    return null;
+  };
 
-  if (typeof product.image === 'string') return product.image;
-  // Agar image ek object hai (common in Cloudinary/Multer)
-  if (typeof product.image === 'object') return product.image.url || product.image.secure_url;
-  return null;
-};
-  // const getProductImage = (product) => {
-  //   if (!product.image) return null;
-  //   return typeof product.image === 'string' ? product.image : null;
-  // };
-  
-  // Helper function to get category display name
   const getCategoryName = (category) => {
     if (!category) return 'Uncategorized';
-    if (typeof category === 'object') {
-      return category.name || 'Uncategorized';
-    }
+    if (typeof category === 'object') return category.name || 'Uncategorized';
     return category;
   };
 
@@ -232,18 +184,14 @@ const handleAddToCart = async (product) => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div className="text-gray-600">
           We found{" "}
-          <span className="text-emerald-600 font-bold">
-            {filteredProducts.length}
-          </span>{" "}
+          <span className="text-emerald-600 font-bold">{filteredProducts.length}</span>{" "}
           items for you!
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
-          {/* Show Dropdown */}
           <div className="flex items-center gap-2">
             <span className="text-gray-600 text-sm flex items-center gap-1">
-              <Grid className="w-4 h-4" />
-              Show:
+              <Grid className="w-4 h-4" /> Show:
             </span>
             <select
               value={showCount}
@@ -256,11 +204,9 @@ const handleAddToCart = async (product) => {
             </select>
           </div>
 
-          {/* Sort By Dropdown */}
           <div className="flex items-center gap-2">
             <span className="text-gray-600 text-sm flex items-center gap-1">
-              <List className="w-4 h-4" />
-              Sort by:
+              <List className="w-4 h-4" /> Sort by:
             </span>
             <select
               value={sortBy}
@@ -307,150 +253,132 @@ const handleAddToCart = async (product) => {
 
       {/* Products Grid */}
       {displayedProducts.length === 0 ? (
-        <div className="text-center py-20 text-gray-500">
-          No products match your filters
-        </div>
+        <div className="text-center py-20 text-gray-500">No products match your filters</div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-          {displayedProducts.map((product) => (
-            // console.log(product),
-            
-            <div
-              key={getProductId(product) || Math.random()}
-              className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group relative"
-            >
-              {/* Product Badge */}
-              {product.badge && (
-                <div
-                  className={`absolute top-3 left-3 ${product.badgeColor || "bg-emerald-500"} text-white text-xs px-3 py-1 rounded-full font-semibold z-10`}
-                >
-                  {product.badge}
-                </div>
-              )}
+          {displayedProducts.map((product) => {
+            const inWishlist = isInWishlist(getProductId(product)); // ✅ Wishlist status per product
 
-              {/* Hover Actions */}
-              <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-               <button
-  onClick={() => handleWishlist(product)}
-  disabled={loadingId === product._id}
-  className={`w-8 h-8 rounded-full shadow-md flex items-center justify-center transition-all duration-300
-    ${
-      isWishlist(product._id)
-        ? "bg-red-500 text-white scale-110"
-        : "bg-white text-gray-600 hover:bg-red-500 hover:text-white"
-    }
-  `}
->
-  {loadingId === product._id ? (
-    <div className="w-3 h-3 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-  ) : (
-    <Heart
-      className={`w-4 h-4 ${
-        isWishlist(product._id) ? "fill-white" : ""
-      }`}
-    />
-  )}
-</button>
-
-                {/* <button 
-                className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors">
-                  <Heart className="w-4 h-4" />
-                </button> */}
-                <button
-                onClick={()=>navigate(`/product/${product._id}`)}
-                
-                className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors">
-                  <Eye className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Product Image */}
-              <div className="bg-gray-50 p-6 md:p-8 flex items-center justify-center h-40 md:h-48">
-                {getProductImage(product) ? (
-                  <img
-                    src={getProductImage(product)}
-                    alt={getProductName(product)}
-                   
-                    
-                    className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300"
-                  //  image error handling - FIXED: Show placeholder on error
-                    onError={(e)=>{
-                    e.target.onerror = null;
-                    e.target.src = "https://t3.ftcdn.net/jpg/05/04/28/96/360_F_504289605_zehJiK0tCuZLP2MdfFBpcJdOVxKLnXg1.jpg";
-                  }}
-                  />
-                ) : (
-                  <span className="text-6xl md:text-7xl group-hover:scale-110 transition-transform duration-300">
-                    🛒
-                  </span>
-                )}
-              </div>
-
-              {/* Product Info */}
-              <div className="p-3 md:p-4">
-                {/* FIXED: Display category name properly */}
-                <p className="text-xs text-gray-500 mb-1">
-                  {getCategoryName(product.category)}
-                </p>
-                <h3 className="font-semibold text-gray-800 text-sm mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
-                  {getProductName(product)}
-                </h3>
-
-                {/* Rating */}
-                <div className="flex items-center gap-2 mb-2">
-                  {renderStars(product.rating)}
-                  <span className="text-xs text-gray-500">
-                    ({product.rating || 0})
-                  </span>
-                </div>
-
-                {/* Brand */}
-                {product.brand && (
-                  <p className="text-xs text-gray-500 mb-3">
-                    By <span className="text-emerald-600">{product.brand}</span>
-                  </p>
-                )}
-
-                {/* Price and Cart */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-emerald-600 font-bold text-base md:text-lg">
-                      ${getProductPrice(product)}
-                    </span>
-                    {product.originalPrice && (
-                      <span className="text-gray-400 line-through text-xs md:text-sm">
-                        ${product.originalPrice}
-                      </span>
-                    )}
+            return (
+              <div
+                key={getProductId(product) || Math.random()}
+                className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group relative"
+              >
+                {/* Badge */}
+                {product.badge && (
+                  <div className={`absolute top-3 left-3 ${product.badgeColor || "bg-emerald-500"} text-white text-xs px-3 py-1 rounded-full font-semibold z-10`}>
+                    {product.badge}
                   </div>
-                  {/* <button
-                  onClick={()=>{
-                 console.log("Add tu cart clicked");
-                 handleAddToCart(product);
-                 
+                )}
 
-
-                  }}
+                {/* Hover Actions */}
+                <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   
-                  
-                  className="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-500 hover:text-white transition-colors">
-                    <ShoppingCart className="w-4 h-4" />
-                  </button> */}
+                  {/* ✅ Wishlist Button — wishlist mein ho toh HAMESHA filled red heart */}
                   <button
-                    onClick={() => handleAddToCart(product)}
+                    onClick={() => handleWishlist(product)}
                     disabled={loadingId === product._id}
-                    className="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center"
+                    className={`w-8 h-8 rounded-full shadow-md flex items-center justify-center transition-all duration-300
+                      ${inWishlist
+                        ? "bg-red-500 text-white scale-110"
+                        : "bg-white text-gray-600 hover:bg-red-500 hover:text-white"
+                      }`}
                   >
                     {loadingId === product._id ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-3 h-3 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
                     ) : (
-                      <ShoppingCart className="w-4 h-4" />
+                      <Heart
+                        className="w-4 h-4"
+                        // ✅ Wishlist mein ho toh fill white (kyunki bg red hai), nahi toh empty
+                        fill={inWishlist ? "white" : "none"}
+                        stroke={inWishlist ? "white" : "currentColor"}
+                      />
                     )}
                   </button>
+
+                  {/* View Button */}
+                  <button
+                    onClick={() => navigate(`/product/${product._id}`)}
+                    className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-colors"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* ✅ Wishlist mein ho toh card ke corner par bhi filled heart dikhao (hover ke baghair bhi) */}
+                {inWishlist && (
+                  <div className="absolute top-3 right-3 z-10">
+                    <div className="w-8 h-8 bg-red-500 rounded-full shadow-md flex items-center justify-center group-hover:opacity-0 transition-opacity">
+                      <Heart className="w-4 h-4" fill="white" stroke="white" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Product Image */}
+                <div className="bg-gray-50 p-6 md:p-8 flex items-center justify-center h-40 md:h-48">
+                  {getProductImage(product) ? (
+                    <img
+                      src={getProductImage(product)}
+                      alt={getProductName(product)}
+                      className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://t3.ftcdn.net/jpg/05/04/28/96/360_F_504289605_zehJiK0tCuZLP2MdfFBpcJdOVxKLnXg1.jpg";
+                      }}
+                    />
+                  ) : (
+                    <span className="text-6xl md:text-7xl group-hover:scale-110 transition-transform duration-300">🛒</span>
+                  )}
+                </div>
+
+                {/* Product Info */}
+                <div className="p-3 md:p-4">
+                  <p className="text-xs text-gray-500 mb-1">{getCategoryName(product.category)}</p>
+                  <h3 className="font-semibold text-gray-800 text-sm mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
+                    {getProductName(product)}
+                  </h3>
+
+                  <div className="flex items-center gap-2 mb-2">
+                    {renderStars(product.rating)}
+                    <span className="text-xs text-gray-500">({product.rating || 0})</span>
+                  </div>
+
+                  {product.brand && (
+                    <p className="text-xs text-gray-500 mb-3">
+                      By <span className="text-emerald-600">{product.brand}</span>
+                    </p>
+                  )}
+
+                  {/* Price + Cart */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-emerald-600 font-bold text-base md:text-lg">
+                        ${getProductPrice(product)}
+                      </span>
+                      {product.originalPrice && (
+                        <span className="text-gray-400 line-through text-xs md:text-sm">
+                          ${product.originalPrice}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* ✅ Cart Button — login nahi toh login par redirect */}
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      disabled={loadingId === product._id}
+                      className="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center"
+                    >
+                      {loadingId === product._id ? (
+                        <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <ShoppingCart className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

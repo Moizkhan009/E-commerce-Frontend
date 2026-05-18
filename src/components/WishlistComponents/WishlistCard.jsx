@@ -65,11 +65,11 @@ const price = item.price || prod.price || 0;
       {/* ── Image ── */}
       <div style={s.imgWrap}>
         <img
-          src={image || "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80"}
+          src={image || "https://t3.ftcdn.net/jpg/05/04/28/96/360_F_504289605_zehJiK0tCuZLP2MdfFBpcJdOVxKLnXg1.jpg"}
           alt={name}
           style={{ ...s.img, transform: hov ? "scale(1.07)" : "scale(1)" }}
           onError={e => {
-            e.target.src = "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80";
+            e.target.src = "https://t3.ftcdn.net/jpg/05/04/28/96/360_F_504289605_zehJiK0tCuZLP2MdfFBpcJdOVxKLnXg1.jpg";
           }}
         />
         <div style={s.imgGrad} />

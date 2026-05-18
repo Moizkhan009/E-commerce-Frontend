@@ -1,44 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, Heart, Phone, Menu, X, User, Home, Package, Info, FileText, Mail, LogIn } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
-import {useSelector } from 'react-redux'; 
-const Header = () => {
-  const location = useLocation(); // Fixed: lowercase 'location'
+import React, { useState, useEffect } from "react";
+import {persistor} from "../redux/store";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { clearWishlist ,fetchWishlist} from "../redux/Wishlist/wishlistSlice";
+import storage from "redux-persist/lib/storage";
+import { persistReducer, persistStore } from "redux-persist";
+import { combineReducers } from "@reduxjs/toolkit";
+import { getCart, clearCart } from "../redux/Cart/Cartslice";
+import {
+  Search,
+  ShoppingCart,
+  Heart,
+  Phone,
+  Menu,
+  X,
+  User,
+  Home,
+  Package,
+  Info,
+  FileText,
+  Mail,
+  LogIn,
+  LogOut,
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+const Header = ({ isAuth, userInfo, setIsAuth, setUserInfo }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  // const dispatch = useDispatch();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  const wishlisState = useSelector((state) => state.wishlist);
+  const cartState = useSelector((state) => state.cart);
+    const dispatch = useDispatch();
 
 
-  const wishlisState = useSelector((state) => state.wishlist );   /// Access wishlist items from Redux store
-const cartState = useSelector((state)=> state.cart);  /// Access cart items from Redux store
-  
+  const handleLogout = async () => {
+    localStorage.removeItem("userInfo");
+    dispatch(clearCart());
+    dispatch(clearWishlist()); 
+    // dispatch(clearWishlist());
+    setIsAuth(false);
+    // await persistor.purge();
 
-const wishlistCount = wishlisState?.items?.length || 
- wishlisState?.data?.length || 0;  /// Calculate wishlist count
-const cartCount = cartState?.cartItems?.length ||
-cartState?.data?.length || 0;  /// Calculate cart count 
 
-useEffect(() => {
+    setUserInfo(null);
+    setIsDrawerOpen(false);
+      dispatch({ type: "cart/reset" });
+       await persistor.purge();
+
+  };
+
+  const wishlistCount =
+  wishlisState?.items?.length || 0;
+const cartCount =
+  cartState?.cartItems?.reduce(
+    (acc, item) => acc + item.qty,
+    0
+  ) || 0;
+  useEffect(() => {
+
+  if (
+  isAuth && userInfo?.token
+  ) {
+dispatch(fetchWishlist());
+    dispatch(getCart());
+
+  }
+  else{
+    dispatch(clearCart());
+    dispatch(clearWishlist());
+  }
+
+}, [isAuth,userInfo, dispatch]);
+  useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 1024);
     };
-
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-
-    return () => {
-      window.removeEventListener('resize', checkScreenSize);
-    };
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   const navigationItems = [
-    { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" />, path: '/' }, // Changed from '/home' to '/'
-    { id: 'deals', label: 'Hot Deals', icon: <span className="text-red-500">🔥</span>, path: '/deals' },
-    { id: 'shop', label: 'Shop', icon: <Package className="w-5 h-5" />, path: '/shop' },
-    { id: 'about', label: 'About', icon: <Info className="w-5 h-5" />, path: '/about' },
-    { id: 'blog', label: 'Blog', icon: <FileText className="w-5 h-5" />, path: '/blog' },
-    { id: 'contact', label: 'Contact', icon: <Mail className="w-5 h-5" />, path: '/contact' },
+    {
+      id: "home",
+      label: "Home",
+      icon: <Home className="w-5 h-5" />,
+      path: "/",
+    },
+    {
+      id: "deals",
+      label: "Hot Deals",
+      icon: <span className="text-red-500">🔥</span>,
+      path: "/deals",
+    },
+    {
+      id: "shop",
+      label: "Shop",
+      icon: <Package className="w-5 h-5" />,
+      path: "/shop",
+    },
+    {
+      id: "about",
+      label: "About",
+      icon: <Info className="w-5 h-5" />,
+      path: "/about",
+    },
+    {
+      id: "blog",
+      label: "Blog",
+      icon: <FileText className="w-5 h-5" />,
+      path: "/blog",
+    },
+    {
+      id: "contact",
+      label: "Contact",
+      icon: <Mail className="w-5 h-5" />,
+      path: "/contact",
+    },
   ];
 
   return (
@@ -56,11 +140,12 @@ useEffect(() => {
                 <Menu className="w-6 h-6" />
               </button>
 
-              {/* Logo */}
               <div className="flex items-center gap-2">
                 <Link to="/" className="flex items-center gap-2">
                   <div>
-                    <h1 className="text-emerald-600 text-2xl font-bold leading-none">Nest</h1>
+                    <h1 className="text-emerald-600 text-2xl font-bold leading-none">
+                      Nest
+                    </h1>
                     <p className="text-xs text-gray-500">MART & GROCERY</p>
                   </div>
                 </Link>
@@ -81,10 +166,10 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* Mobile Search Icon and Right Icons */}
+            {/* Right Side Icons */}
             <div className="flex items-center gap-4">
               {/* Mobile Search Icon */}
-              <button 
+              <button
                 className="lg:hidden text-gray-600 hover:text-emerald-600"
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
               >
@@ -108,10 +193,13 @@ useEffect(() => {
                 </div>
               )}
 
-              {/* Right Icons - Desktop Only */}
+              {/* Desktop Right Icons */}
               <div className="hidden lg:flex items-center gap-6">
                 {/* Wishlist */}
-                <Link to="/wishlist" className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link
+                  to="/wishlist"
+                  className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors"
+                >
                   <div className="relative">
                     <Heart className="w-6 h-6" />
                     <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
@@ -122,7 +210,10 @@ useEffect(() => {
                 </Link>
 
                 {/* Cart */}
-                <Link to="/cart" className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors">
+                <Link
+                  to="/cart"
+                  className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors"
+                >
                   <div className="relative">
                     <ShoppingCart className="w-6 h-6" />
                     <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
@@ -132,11 +223,72 @@ useEffect(() => {
                   <span className="text-xs mt-1">Cart</span>
                 </Link>
 
-                {/* Account */}
-                <Link to="/login" className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors">
-                  <LogIn className="w-6 h-6" />
-                  <span className="text-xs mt-1">Login</span>
-                </Link>
+                {/* ✅ LOGIN / LOGOUT - Desktop (same style as Wishlist & Cart) */}
+                {/* {isAuth ? (
+
+                  <button
+                    onClick={handleLogout}
+                    className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-6 h-6" />
+                    <span className="text-xs mt-1">Logout</span>
+                  </button>
+                ) : (
+                  <Link to="/login" className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors">
+                    <LogIn className="w-6 h-6" />
+                    <span className="text-xs mt-1">Login</span>
+                  </Link>
+                )} */}
+                {/* {isAuth ? (
+                  <Link
+                    to="/profile"
+                    className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors"
+                  >
+                    <User className="w-6 h-6" />
+                    <span className="text-xs mt-1">Profile</span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors"
+                  >
+                    <LogIn className="w-6 h-6" />
+                    <span className="text-xs mt-1">Login</span>
+                  </Link>
+                  
+                )} */}
+                {userInfo ? (
+                  <>
+                    {/* Profile */}
+                    <Link
+                      to="/profile"
+                      className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors"
+                    >
+                      <User className="w-6 h-6" />
+                      <span className="text-xs mt-1">Profile</span>
+                    </Link>
+
+                    {/* Admin (only for admin) */}
+                    {userInfo?.user?.role === "admin" && (
+                      <Link
+                        to="/admin"
+                        className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors"
+                      >
+                        <span className="text-xs mt-1 text-red-500 font-semibold">
+                          Admin
+                        </span>
+                      </Link>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="flex flex-col items-center text-gray-600 hover:text-emerald-600 transition-colors"
+                  >
+                    <LogIn className="w-6 h-6" />
+                    <span className="text-xs mt-1">Login</span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -147,23 +299,20 @@ useEffect(() => {
       <div className="bg-white border-b shadow-sm hidden lg:block">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
-            {/* Browse Categories Button */}
             <button className="bg-emerald-500 text-white px-4 py-2 rounded-b-md flex items-center gap-2 hover:bg-emerald-600 transition-colors min-w-[220px]">
               <Menu className="w-5 h-5" />
               <span className="font-semibold">Browse All Categories</span>
             </button>
 
-            {/* Desktop Navigation Links */}
             <nav className="flex items-center gap-8">
               {navigationItems.map((item) => (
                 <Link
                   key={item.id}
                   to={item.path}
-                  className={`flex items-center gap-2 py-4 font-medium transition-colors ${
-                    location.pathname === item.path
-                      ? 'text-emerald-600 border-b-2 border-emerald-600'
-                      : 'text-gray-700 hover:text-emerald-600'
-                  }`}
+                  className={`flex items-center gap-2 py-4 font-medium transition-colors ${location.pathname === item.path
+                      ? "text-emerald-600 border-b-2 border-emerald-600"
+                      : "text-gray-700 hover:text-emerald-600"
+                    }`}
                 >
                   {item.icon}
                   {item.label}
@@ -171,7 +320,6 @@ useEffect(() => {
               ))}
             </nav>
 
-            {/* Phone Number */}
             <div className="flex items-center gap-2 text-emerald-600 min-w-[200px] justify-end">
               <Phone className="w-5 h-5" />
               <span className="font-bold text-lg">+923242443881</span>
@@ -180,18 +328,17 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Mobile Navigation Tabs - Below Search Bar */}
+      {/* Mobile Navigation Tabs */}
       <div className="lg:hidden bg-white border-b shadow-sm overflow-x-auto">
         <div className="flex">
           {navigationItems.map((item) => (
             <Link
               key={item.id}
               to={item.path}
-              className={`flex-shrink-0 flex items-center gap-2 px-4 py-3 font-medium text-sm transition-colors whitespace-nowrap ${
-                location.pathname === item.path
-                  ? 'text-emerald-600 border-b-2 border-emerald-600'
-                  : 'text-gray-700 hover:text-emerald-600'
-              }`}
+              className={`flex-shrink-0 flex items-center gap-2 px-4 py-3 font-medium text-sm transition-colors whitespace-nowrap ${location.pathname === item.path
+                  ? "text-emerald-600 border-b-2 border-emerald-600"
+                  : "text-gray-700 hover:text-emerald-600"
+                }`}
             >
               {item.icon}
               <span>{item.label}</span>
@@ -201,24 +348,28 @@ useEffect(() => {
       </div>
 
       {/* Mobile Drawer */}
-      <div className={`fixed inset-0 z-50 transition-transform duration-300 ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div
+        className={`fixed inset-0 z-50 transition-transform duration-300 ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
         {/* Overlay */}
-        <div 
+        <div
           className="absolute inset-0 bg-black bg-opacity-50"
           onClick={() => setIsDrawerOpen(false)}
         ></div>
-        
+
         {/* Drawer Content */}
         <div className="absolute inset-y-0 left-0 w-80 bg-white shadow-xl overflow-y-auto">
           {/* Drawer Header */}
           <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white">
-            <div className="flex items-center gap-2">
-              <Link to="/" onClick={() => setIsDrawerOpen(false)}>
-                <h1 className="text-emerald-600 text-2xl font-bold">Nest</h1>
-              </Link>
+            <Link
+              to="/"
+              onClick={() => setIsDrawerOpen(false)}
+              className="flex items-center gap-2"
+            >
+              <h1 className="text-emerald-600 text-2xl font-bold">Nest</h1>
               <span className="text-xs text-gray-500">MART</span>
-            </div>
-            <button 
+            </Link>
+            <button
               onClick={() => setIsDrawerOpen(false)}
               className="text-gray-600 hover:text-emerald-600"
             >
@@ -226,33 +377,47 @@ useEffect(() => {
             </button>
           </div>
 
-          {/* User Info */}
+          {/* ✅ User Info - Login/Logout in Drawer */}
           <div className="p-4 border-b">
-            <Link to="/login" onClick={() => setIsDrawerOpen(false)}>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <User className="w-6 h-6 text-emerald-600" />
+            {isAuth ? (
+              <div
+                onClick={handleLogout}
+                className="flex items-center gap-3 cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                  <LogOut className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                  <p className="font-medium">Welcome!</p>
-                  <p className="text-sm text-gray-600">Sign in or Register</p>
+                  <p className="font-medium text-gray-800">Logout</p>
+                  <p className="text-sm text-gray-500">Click to sign out</p>
                 </div>
               </div>
-            </Link>
+            ) : (
+              <Link to="/login" onClick={() => setIsDrawerOpen(false)}>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <User className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800">Welcome!</p>
+                    <p className="text-sm text-gray-500">Sign in or Register</p>
+                  </div>
+                </div>
+              </Link>
+            )}
           </div>
 
-          {/* Navigation in Drawer */}
+          {/* Navigation Links in Drawer */}
           <div className="py-4">
             {navigationItems.map((item) => (
               <Link
                 key={item.id}
                 to={item.path}
                 onClick={() => setIsDrawerOpen(false)}
-                className={`flex items-center gap-3 w-full px-6 py-3 font-medium text-left transition-colors ${
-                  location.pathname === item.path
-                    ? 'text-emerald-600 bg-emerald-50'
-                    : 'text-gray-700 hover:bg-gray-50'
-                }`}
+                className={`flex items-center gap-3 w-full px-6 py-3 font-medium text-left transition-colors ${location.pathname === item.path
+                    ? "text-emerald-600 bg-emerald-50"
+                    : "text-gray-700 hover:bg-gray-50"
+                  }`}
               >
                 {item.icon}
                 <span>{item.label}</span>
@@ -268,7 +433,7 @@ useEffect(() => {
                 <div className="relative">
                   <Heart className="w-6 h-6" />
                   <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    0
+                    {wishlistCount}
                   </span>
                 </div>
                 <span>Wishlist</span>
@@ -281,20 +446,30 @@ useEffect(() => {
                 <div className="relative">
                   <ShoppingCart className="w-6 h-6" />
                   <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    0
+                    {cartCount}
                   </span>
                 </div>
                 <span>Shopping Cart</span>
               </div>
             </Link>
 
-            {/* Login */}
-            <Link to="/login" onClick={() => setIsDrawerOpen(false)}>
-              <div className="flex items-center gap-3 w-full px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
-                <LogIn className="w-6 h-6" />
-                <span>Login / Register</span>
+            {/* ✅ Login/Logout Button in Drawer Features */}
+            {isAuth ? (
+              <div
+                onClick={handleLogout}
+                className="flex items-center gap-3 w-full px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <LogOut className="w-6 h-6" />
+                <span>Logout</span>
               </div>
-            </Link>
+            ) : (
+              <Link to="/login" onClick={() => setIsDrawerOpen(false)}>
+                <div className="flex items-center gap-3 w-full px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
+                  <LogIn className="w-6 h-6" />
+                  <span>Login / Register</span>
+                </div>
+              </Link>
+            )}
           </div>
 
           {/* Phone Number in Drawer */}

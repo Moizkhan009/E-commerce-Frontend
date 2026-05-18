@@ -85,7 +85,7 @@ const ProductActions = ({ product, isWishlisted = false }) => {
         onMouseEnter={e => { if (inStock && !cartAdded) { e.currentTarget.style.background=T.greenDark; e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 28px rgba(59,183,126,.38)"; }}}
         onMouseLeave={e => { if (inStock && !cartAdded) { e.currentTarget.style.background=T.green; e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(59,183,126,.30)"; }}}
       >
-        {cartAdded ? "✓ Added to Cart!" : `🛒 Add to Cart · Rs ${(product.price * qty).toLocaleString()}`}
+        {cartAdded ? "✓ Added to Cart!" : `🛒 Add to Cart · $ ${(product.price * qty).toLocaleString()}`}
       </button>
 
       {/* Wishlist */}
@@ -112,7 +112,7 @@ const ProductActions = ({ product, isWishlisted = false }) => {
 
       {/* Trust row */}
       <div style={s.trustRow}>
-        {["🚚 Free delivery over Rs 999","↩️ Easy 7-day returns","🌿 100% organic"].map((t,i)=>(
+        {["🚚 Free delivery over $ 999","↩️ Easy 7-day returns","🌿 100% organic"].map((t,i)=>(
           <div key={i} style={s.trustItem}>
             <span style={s.trustDot} />{t}
           </div>

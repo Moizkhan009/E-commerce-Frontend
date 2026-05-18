@@ -46,10 +46,10 @@ const ProductMeta = ({ product }) => {
 
     {/* Price */}
     <div style={{ ...s.priceRow, ...fadeUp(180) }}>
-      <span style={s.price}>Rs {product.price}</span>
+      <span style={s.price}> $ {product.price}</span>
       {product.originalPrice && (
         <>
-          <span style={s.origPrice}>Rs {product.originalPrice}</span>
+          <span style={s.origPrice}> $ {product.originalPrice}</span>
           <span style={s.discPill}>
             -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
           </span>
